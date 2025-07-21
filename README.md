@@ -11,7 +11,7 @@ This project is developed by **4 team members**, each responsible for one module
 | Module | Developer | Status |
 |--------|-----------|---------|
 | 🏃‍♂️ **Exercise Tracker** | Team Member 1 | In Development |
-| 📖 **Diary Journal** | **You** | ✅ **Complete** |
+| 📖 **Diary Journal** | **Hui** | ✅ **Need Check** |
 | 💰 **Money Tracker** | Team Member 2 | In Development |
 | ✅ **Habit Tracker** | Team Member 3 | In Development |
 
