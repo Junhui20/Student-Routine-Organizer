@@ -15,9 +15,9 @@ This project is developed by **4 team members**, each responsible for one module
 | 💰 **Money Tracker** | Team Member 2 | In Development |
 | ✅ **Habit Tracker** | Team Member 3 | In Development |
 
-## 🎯 Your Module: Diary Journal
+## 🎯 Module: Diary Journal
 
-You are responsible for the **Diary Journal Module**, which includes:
+For the **Diary Journal Module**, which includes:
 
 ### ✅ Features Implemented
 - **User Registration & Authentication** (shared across all modules)
@@ -66,36 +66,6 @@ student-routine-organizer/
 │   └── style.css             # Shared styling
 ├── index.php                 # Main dashboard
 └── database_schema.sql       # Database setup
-```
-
-## 🗃️ Database Schema
-
-### Tables You're Using:
-
-#### `users` (Shared across all modules)
-```sql
-CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-#### `diary_entries` (Your module)
-```sql
-CREATE TABLE diary_entries (
-    entry_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT NOT NULL,
-    title VARCHAR(200) NOT NULL,
-    content TEXT NOT NULL,
-    mood VARCHAR(20) NOT NULL,
-    entry_date DATE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-);
 ```
 
 ## 🚀 Setup Instructions
@@ -153,7 +123,7 @@ CREATE TABLE diary_entries (
 
 ## 🤝 Integration with Team
 
-Your **Diary Journal Module** is designed to integrate seamlessly with the other team modules:
+**Diary Journal Module** is designed to integrate seamlessly with the other team modules:
 
 - **Shared Authentication**: All modules use the same user login system
 - **Consistent UI/UX**: Same styling and navigation across modules
@@ -182,5 +152,3 @@ When presenting your module, highlight:
 8. **Team integration** readiness
 
 ---
-
-**Your Diary Journal Module is complete and ready for demonstration!** 🎉 
