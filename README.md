@@ -59,7 +59,11 @@ student-routine-organizer/
 │   ├── add_entry.php         # Add entry (CREATE)
 │   ├── edit_entry.php        # Edit entry (UPDATE)
 │   └── delete_entry.php      # Delete entry (DELETE)
-├── exercise/                 # Team Member 1's module (placeholder)
+├── exercises/                 # Team Member 1's module (placeholder)
+│   ├── index.php             # View workout activities history (READ)
+│   ├── add_exercise.php         # Add workout activities (CREATE)
+│   ├── edit_exercise.php        # Edit workout activities record (UPDATE)
+│   └── delete_exercise.php      # Delete workout activities record (DELETE)
 ├── money/                    # Team Member 2's module (placeholder)
 ├── habits/                   # Team Member 3's module (placeholder)
 ├── css/
@@ -120,6 +124,7 @@ student-routine-organizer/
 ✅ **PHP & MySQL**: Server-side processing and data storage  
 ✅ **Web Application**: Accessible via web browser  
 ✅ **Module Specific Features**: Diary journaling with mood tracking  
+✅ **Module Specific Features**: Exercise Tracker with workout activities tracking  
 
 ## 🤝 Integration with Team
 
