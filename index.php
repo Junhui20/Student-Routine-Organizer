@@ -200,22 +200,34 @@ if (session_status() == PHP_SESSION_NONE) {
             <h2 style="text-align: center; margin-bottom: 3rem;"><i class="fas fa-th-large"></i> Choose Your Module</h2>
             
             <div class="feature-grid">
-                <!-- Exercise Tracker Module -->
-                <div class="feature-card">
+                <!-- Exercise Tracker Module - Processing -->
+                <div class="feature-card" style="border: 3px solid #667eea; position: relative;">
+                    <div style="position: absolute; top: -10px; right: -10px; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                        AVAILABLE
+                    </div>
                     <div class="feature-icon">
                         <i class="fas fa-dumbbell"></i>
                     </div>
                     <h3>Exercise Tracker</h3>
                     <p>Track your daily workouts, exercises, duration, and calories burned. Monitor your fitness progress and stay motivated.</p>
                     <div style="margin-top: 2rem;">
-                        <button class="btn btn-primary" onclick="showComingSoon('Exercise Tracker')" style="width: 100%;">
-                            <i class="fas fa-dumbbell"></i> Coming Soon
-                        </button>
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                            <a href="exercises/index.php" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">
+                                <i class="fas fa-chart-line"></i> View My Workouts
+                            </a>
+                            <a href="exercises/add_exercise.php" class="btn btn-success" style="width: 100%;">
+                                <i class="fas fa-plus"></i> Log Workout
+                            </a>
+                        <?php else: ?>
+                            <a href="auth/login.php" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-dumbbell"></i> Start Tracking
+                            </a>
+                        <?php endif; ?>
                     </div>
-                    <small class="text-muted" style="display: block; margin-top: 1rem;">Developed by Team Member 1</small>
+                    <small style="color: #667eea; font-weight: bold; display: block; margin-top: 1rem;">✅ Fully Functional</small>
                 </div>
 
-                <!-- Diary Journal Module - YOUR MODULE -->
+                <!-- Diary Journal Module - YOUR EXISTING MODULE -->
                 <div class="feature-card" style="border: 3px solid #667eea; position: relative;">
                     <div style="position: absolute; top: -10px; right: -10px; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
                         AVAILABLE
@@ -239,7 +251,7 @@ if (session_status() == PHP_SESSION_NONE) {
                             </a>
                         <?php endif; ?>
                     </div>
-                    <small class="text-muted" style="display: block; margin-top: 1rem;">✅ Fully Functional</small>
+                    <small style="color: #667eea; font-weight: bold; display: block; margin-top: 1rem;">✅ Fully Functional</small>
                 </div>
 
                 <!-- Money Tracker Module -->
@@ -283,6 +295,28 @@ if (session_status() == PHP_SESSION_NONE) {
                 $db = new Database();
                 $conn = $db->getConnection();
                 
+                // Get exercise statistics
+                $stmt = $conn->prepare("
+                    SELECT 
+                        COUNT(*) as total_exercises,
+                        SUM(duration_minutes) as total_minutes,
+                        SUM(calories_burned) as total_calories
+                    FROM exercise_tracker 
+                    WHERE user_id = ?
+                ");
+                $stmt->execute([$_SESSION['user_id']]);
+                $exercise_stats = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                $stmt = $conn->prepare("
+                    SELECT 
+                        COUNT(*) as recent_exercises,
+                        SUM(duration_minutes) as recent_minutes
+                    FROM exercise_tracker 
+                    WHERE user_id = ? AND exercise_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+                ");
+                $stmt->execute([$_SESSION['user_id']]);
+                $recent_exercise = $stmt->fetch(PDO::FETCH_ASSOC);
+                
                 // Get diary statistics
                 $stmt = $conn->prepare("SELECT COUNT(*) as total_entries FROM diary_entries WHERE user_id = ?");
                 $stmt->execute([$_SESSION['user_id']]);
@@ -293,6 +327,31 @@ if (session_status() == PHP_SESSION_NONE) {
                 $recent_entries = $stmt->fetch(PDO::FETCH_ASSOC)['recent_entries'];
                 
                 echo "<div class='feature-grid'>";
+
+                // Exercise Stats
+                echo "<div class='feature-card'>";
+                echo "<div class='feature-icon'><i class='fas fa-dumbbell'></i></div>";
+                echo "<h3>" . ($exercise_stats['total_exercises'] ?? 0) . "</h3>";
+                echo "<p>Workouts Logged</p>";
+                echo "<small class='text-muted'>" . ($recent_exercise['recent_exercises'] ?? 0) . " this week</small>";
+                echo "</div>";
+            
+                // Exercise Time Stats
+                echo "<div class='feature-card'>";
+                echo "<div class='feature-icon'><i class='fas fa-clock'></i></div>";
+                echo "<h3>" . number_format($exercise_stats['total_minutes'] ?? 0) . " min</h3>";
+                echo "<p>Exercise Time</p>";
+                echo "<small class='text-muted'>" . ($recent_exercise['recent_minutes'] ?? 0) . " min this week</small>";
+                echo "</div>";
+                
+                // Calories Stats
+                echo "<div class='feature-card'>";
+                echo "<div class='feature-icon'><i class='fas fa-fire'></i></div>";
+                echo "<h3>" . number_format($exercise_stats['total_calories'] ?? 0) . "</h3>";
+                echo "<p>Calories Burned</p>";
+                echo "<small class='text-muted'>From tracked exercises</small>";
+                echo "</div>";
+
                 
                 // Diary Stats
                 echo "<div class='feature-card'>";
@@ -301,22 +360,16 @@ if (session_status() == PHP_SESSION_NONE) {
                 echo "<p>Total Diary Entries</p>";
                 echo "<small class='text-muted'>$recent_entries this week</small>";
                 echo "</div>";
-                
-                // Placeholder stats for other modules
-                echo "<div class='feature-card'>";
-                echo "<div class='feature-icon'><i class='fas fa-dumbbell'></i></div>";
-                echo "<h3>0</h3>";
-                echo "<p>Workouts Logged</p>";
-                echo "<small class='text-muted'>Feature coming soon</small>";
-                echo "</div>";
-                
+
+                // Balance
                 echo "<div class='feature-card'>";
                 echo "<div class='feature-icon'><i class='fas fa-wallet'></i></div>";
                 echo "<h3>$0.00</h3>";
                 echo "<p>Balance Tracked</p>";
                 echo "<small class='text-muted'>Feature coming soon</small>";
                 echo "</div>";
-                
+
+                 // Habits Tracked
                 echo "<div class='feature-card'>";
                 echo "<div class='feature-icon'><i class='fas fa-check-circle'></i></div>";
                 echo "<h3>0</h3>";
@@ -337,16 +390,16 @@ if (session_status() == PHP_SESSION_NONE) {
         <div class="container">
             <h2 style="text-align: center;"><i class="fas fa-users"></i> Development Team</h2>
             <div class="feature-grid">
-                <div class="feature-card text-center">
+                <div class="feature-card text-center" style="border: 2px solid  #27ae60;">
                     <div class="feature-icon"><i class="fas fa-dumbbell"></i></div>
                     <h4>Exercise Tracker</h4>
-                    <p>Team Member 1</p>
-                    <small class="text-muted">In Development</small>
+                    <p><strong>Jooyee</strong></p>
+                    <small style="color: #27ae60; font-weight: bold;">Processing</small>
                 </div>
                 <div class="feature-card text-center" style="border: 2px solid #27ae60;">
                     <div class="feature-icon"><i class="fas fa-book-open"></i></div>
                     <h4>Diary Journal</h4>
-                    <p><strong>You</strong></p>
+                    <p><strong>JunHui</strong></p>
                     <small style="color: #27ae60; font-weight: bold;">✅ Complete</small>
                 </div>
                 <div class="feature-card text-center">
@@ -374,7 +427,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
     <script>
     function showComingSoon(moduleName) {
-        alert(`${moduleName} module is currently being developed by another team member.\n\nThe Diary Journal module is fully functional and ready to use!`);
+        alert(`${moduleName} module is currently being developed by another team member.\n\nThe Exercise Tracker and Diary Journal modules are fully functional and ready to use!`);
     }
     </script>
 </body>

@@ -5,13 +5,14 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `diary_journal`
+-- Database: `student_routine_db`
 --
 
 -- --------------------------------------------------------
@@ -49,6 +50,76 @@ CREATE TABLE `error_logs` (
   `user_agent` varchar(500) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exercises`
+--
+
+CREATE TABLE `exercises` (
+  `id` int(11) NOT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `exercise_name` varchar(100) DEFAULT NULL,
+  `met_value` decimal(4,1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `exercises`
+--
+
+INSERT INTO `exercises` (`id`, `category`, `exercise_name`, `met_value`) VALUES
+(1, 'Running & Jogging', 'Jogging', 7.5),
+(2, 'Running & Jogging', 'Running, 5 mph (12 min/mile)', 8.5),
+(3, 'Running & Jogging', 'Running, 6 mph (10 min/mile)', 9.3),
+(4, 'Running & Jogging', 'Running, 7 mph (8.5 min/mile)', 11.0),
+(5, 'Bicycling', 'Bicycling', 7.0),
+(6, 'Bicycling', 'Bicycling, mountain', 8.5),
+(7, 'Yoga & Pilates', 'Yoga', 2.3),
+(8, 'Yoga & Pilates', 'Yoga, Surya Namaskar', 3.5),
+(9, 'Yoga & Pilates', 'Pilates', 2.8),
+(10, 'Gym & Calisthenics', 'Pushups, sit ups, pull-ups, vigorous effort', 7.5),
+(11, 'Gym & Calisthenics', 'Pushups, sit ups, moderate effort', 3.8),
+(12, 'Gym & Calisthenics', 'Plank, crunches, light effort', 2.8),
+(13, 'Gym & Calisthenics', 'Stationary bike', 6.8),
+(14, 'Gym & Calisthenics', 'Rowing machine (moderate effort)', 7.5),
+(15, 'Gym & Calisthenics', 'Rowing machine (very vigorous)', 14.0),
+(16, 'Gym & Calisthenics', 'Rope skipping (jump rope)', 11.0),
+(17, 'Dance', 'Zumba', 6.5),
+(18, 'Dance', 'Jazz dancing', 4.5),
+(19, 'Dance', 'Ballet', 5.0),
+(20, 'Sports', 'Basketball', 7.5),
+(21, 'Sports', 'Badminton', 5.5),
+(22, 'Sports', 'Volleyball', 4.0),
+(23, 'Sports', 'Beach Volleyball', 8.0),
+(24, 'Sports', 'Football', 8.0),
+(25, 'Sports', 'Hockey', 8.0),
+(26, 'Water Activities', 'Swimming', 6.0),
+(27, 'Water Activities', 'Water aerobics', 5.5),
+(28, 'Water Activities', 'Water polo', 10.0),
+(29, 'Martial Arts', 'Muay Thai boxing', 10.3),
+(30, 'Martial Arts', 'Judo', 11.3),
+(31, 'Martial Arts', 'Taekwondo', 14.3);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `exercise_tracker`
+--
+
+CREATE TABLE `exercise_tracker` (
+  `exercise_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `exercise_ref_id` int(11) DEFAULT NULL,
+  `exercise_type` varchar(100) NOT NULL,
+  `duration_minutes` int(11) NOT NULL,
+  `calories_burned` int(11) DEFAULT NULL,
+  `exercise_date` date NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `exercise_time` time DEFAULT NULL,
+  `notes` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -122,6 +193,22 @@ ALTER TABLE `error_logs`
   ADD KEY `idx_user_errors` (`user_id`);
 
 --
+-- Indexes for table `exercises`
+--
+ALTER TABLE `exercises`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `exercise_tracker`
+--
+ALTER TABLE `exercise_tracker`
+  ADD PRIMARY KEY (`exercise_id`),
+  ADD KEY `idx_user_date` (`user_id`,`exercise_date`),
+  ADD KEY `idx_exercise_type` (`exercise_type`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `fk_exercise_ref` (`exercise_ref_id`);
+
+--
 -- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
@@ -165,6 +252,18 @@ ALTER TABLE `error_logs`
   MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `exercises`
+--
+ALTER TABLE `exercises`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+
+--
+-- AUTO_INCREMENT for table `exercise_tracker`
+--
+ALTER TABLE `exercise_tracker`
+  MODIFY `exercise_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- AUTO_INCREMENT for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
@@ -174,7 +273,7 @@ ALTER TABLE `password_reset_tokens`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `user_remember_tokens`
@@ -199,6 +298,13 @@ ALTER TABLE `error_logs`
   ADD CONSTRAINT `error_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
 --
+-- Constraints for table `exercise_tracker`
+--
+ALTER TABLE `exercise_tracker`
+  ADD CONSTRAINT `exercise_tracker_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_exercise_ref` FOREIGN KEY (`exercise_ref_id`) REFERENCES `exercises` (`id`);
+
+--
 -- Constraints for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
@@ -209,9 +315,8 @@ ALTER TABLE `password_reset_tokens`
 --
 ALTER TABLE `user_remember_tokens`
   ADD CONSTRAINT `user_remember_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
-
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */; 
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
