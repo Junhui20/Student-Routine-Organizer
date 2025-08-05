@@ -20,3 +20,8 @@ Stack trace:
 URL: /diary-journal/auth/forgot_password.php
 IP: ::1
 
+[2025-08-05 11:47:10] EXCEPTION: Call to private ErrorHandler::__construct() from global scope in forgot_password.php:14
+Stack trace:
+URL: /student-routine-organizer/auth/forgot_password.php
+IP: ::1
+

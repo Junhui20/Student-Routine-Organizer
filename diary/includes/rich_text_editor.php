@@ -118,7 +118,7 @@
     </div>
 
     <!-- Hidden textarea for form submission -->
-    <textarea name="content" id="content-textarea" style="display: none;" required></textarea>
+    <textarea name="content" id="content-textarea" style="display: none;"></textarea>
 </div>
 
 <style>
@@ -573,6 +573,8 @@ class RichTextEditor {
     
     syncContent() {
         this.textarea.value = this.editor.innerHTML;
+        // Also trigger input event to ensure form validation works
+        this.textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
     
     updateWordCount() {
@@ -603,22 +605,18 @@ class RichTextEditor {
         }
     }
     
-
-    
-
-    
-
-        // Add new alignment
-        img.classList.add(alignment);
-        this.syncContent();
+    // Add method to check if editor is properly initialized
+    isInitialized() {
+        return this.editor && this.textarea && this.wordCounter;
     }
     
-
-    
-
-    
-
-
+    // Add method to force sync content
+    forceSyncContent() {
+        if (this.editor && this.textarea) {
+            this.textarea.value = this.editor.innerHTML;
+            console.log('Content synced:', this.textarea.value);
+        }
+    }
 }
 
 // Special insert functions

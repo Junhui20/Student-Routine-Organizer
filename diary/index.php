@@ -48,7 +48,7 @@ require_once '../config/database.php';
     ?>
 
     <!-- Entries Container for Search/Filter Results -->
-    <div class="entries-container">
+    <div class="entries-container" id="entries-container">
     <?php
     try {
         $db = new Database();

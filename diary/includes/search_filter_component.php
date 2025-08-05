@@ -9,9 +9,6 @@
     <!-- Search Bar -->
     <div class="search-section">
         <div class="search-input-group">
-            <div class="search-icon">
-                <i class="fas fa-search"></i>
-            </div>
             <input type="text" id="search-input" placeholder="Search your diary entries..." class="search-input">
             <button type="button" id="clear-search" class="clear-search-btn" style="display: none;">
                 <i class="fas fa-times"></i>
@@ -182,21 +179,18 @@
     align-items: center;
 }
 
-.search-icon {
-    position: absolute;
-    left: 15px;
-    color: #6c757d;
-    z-index: 2;
-}
+
 
 .search-input {
     width: 100%;
-    padding: 12px 45px 12px 45px;
+    padding: 12px 45px 12px 16px;
     border: 2px solid #e1e5e9;
     border-radius: 25px;
     font-size: 16px;
     transition: border-color 0.3s, box-shadow 0.3s;
     background: #f8f9fa;
+    height: 44px;
+    box-sizing: border-box;
 }
 
 .search-input:focus {
@@ -206,9 +200,16 @@
     background: white;
 }
 
+.search-input:hover {
+    border-color: #adb5bd;
+    background: #f1f3f4;
+}
+
 .clear-search-btn {
     position: absolute;
     right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     background: #6c757d;
     color: white;
     border: none;
@@ -220,6 +221,8 @@
     align-items: center;
     justify-content: center;
     z-index: 2;
+    font-size: 12px;
+    transition: background-color 0.2s;
 }
 
 .clear-search-btn:hover {
@@ -335,15 +338,16 @@
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 1.2rem;
     margin-bottom: 1.5rem;
 }
 
 .filter-group {
     background: #f8f9fa;
-    padding: 1.5rem;
+    padding: 1.5rem 1.2rem;
     border-radius: 10px;
     border: 1px solid #e9ecef;
+    margin-bottom: 0.5rem;
 }
 
 .filter-label {
@@ -360,13 +364,41 @@
 .date-range-inputs {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
 }
 
 .date-separator {
     color: #6c757d;
+    font-size: 15px;
+    margin: 0 4px;
+    display: flex;
+    align-items: center;
+}
+
+/* Date input specific styling */
+.date-range-inputs input[type="date"] {
+    flex: 1;
+    padding: 6px 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
     font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
+    min-width: 140px;
+    background: white;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.date-range-inputs input[type="date"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.date-range-inputs input[type="date"]:hover {
+    border-color: #adb5bd;
 }
 
 .filter-input {
@@ -375,6 +407,8 @@
     border: 1px solid #dee2e6;
     border-radius: 6px;
     font-size: 14px;
+    height: 38px;
+    box-sizing: border-box;
 }
 
 .filter-input:focus {
@@ -610,6 +644,17 @@
     .date-range-inputs {
         flex-direction: column;
         align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .date-range-inputs input[type="date"] {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .date-separator {
+        text-align: center;
+        margin: 0.5rem 0;
     }
     
     .filter-actions {
@@ -620,6 +665,10 @@
         flex-direction: column;
         gap: 1rem;
         align-items: stretch;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Prevents zoom on iOS */
     }
 }
 </style>
@@ -656,8 +705,8 @@ class DiarySearchFilter {
         this.initSortFilter();
         this.initFilterActions();
         
-        // Load initial results
-        this.applyFilters();
+        // Don't apply filters on initial load - let the page show all entries
+        // this.applyFilters();
     }
     
     initSearchInput() {
@@ -967,14 +1016,24 @@ class DiarySearchFilter {
         
         // Update entries display
         this.updateEntriesDisplay(data.entries);
+        
+        // Debug logging
+        console.log('Search results:', {
+            count: data.count,
+            entries: data.entries,
+            searchTime: searchTime
+        });
     }
     
     updateEntriesDisplay(entries) {
-        const entriesContainer = document.querySelector('.entries-container') || document.querySelector('.container');
+        const entriesContainer = document.querySelector('.entries-container');
+        if (!entriesContainer) {
+            console.error('Entries container not found');
+            return;
+        }
         
-        // Find existing entries and replace them
-        const existingEntries = entriesContainer.querySelectorAll('.entry-card');
-        existingEntries.forEach(entry => entry.remove());
+        // Clear all existing content including "No entries found" sections
+        entriesContainer.innerHTML = '';
         
         if (entries.length === 0) {
             const noResults = document.createElement('div');
@@ -1006,13 +1065,16 @@ class DiarySearchFilter {
         
         const moodClass = 'mood-' + entry.mood.toLowerCase();
         const contentPreview = this.stripHtml(entry.content).substring(0, 200);
-        const shortContent = contentPreview.length < entry.content.length ? contentPreview + '...' : contentPreview;
+        const shortContent = contentPreview.length < this.stripHtml(entry.content).length ? contentPreview + '...' : contentPreview;
+        
+        // Format date properly
+        const formattedDate = this.formatDisplayDate(entry.entry_date);
         
         div.innerHTML = `
             <div class="entry-header">
                 <h3 class="entry-title">${this.escapeHtml(entry.title)}</h3>
                 <div class="entry-meta">
-                    <span><i class="fas fa-calendar"></i> ${this.formatDisplayDate(entry.entry_date)}</span>
+                    <span><i class="fas fa-calendar"></i> ${formattedDate}</span>
                     <span class="mood-badge ${moodClass}">${this.escapeHtml(entry.mood)}</span>
                 </div>
             </div>

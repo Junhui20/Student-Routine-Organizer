@@ -136,7 +136,7 @@ $default_date = date('Y-m-d');
 
 
         <div style="display: flex; gap: 1rem;">
-            <button type="submit" class="btn btn-success">
+            <button type="submit" class="btn btn-success" id="submit-btn">
                 <i class="fas fa-save"></i> Save Entry
             </button>
             <a href="index.php" class="btn btn-primary">
@@ -146,35 +146,156 @@ $default_date = date('Y-m-d');
     </form>
 </div>
 
-
-
 <!-- Load existing content into rich text editor -->
-<script>
-// Load existing content if present (for error handling or edit mode)
+<script type="text/javascript" src="?v=<?php echo time(); ?>">
+// Cache busting - force reload
+console.log('Script loaded at:', new Date().toISOString());
+
+// Wait for rich text editor to be initialized
 document.addEventListener('DOMContentLoaded', function() {
-    const existingContent = <?php echo json_encode($_POST['content'] ?? ''); ?>;
-    
-    if (existingContent && richTextEditor) {
-        richTextEditor.editor.innerHTML = existingContent;
-        richTextEditor.syncContent();
-        richTextEditor.updateWordCount();
-    }
+    // Wait a bit for the rich text editor to initialize
+    setTimeout(function() {
+        const existingContent = <?php echo json_encode($_POST['content'] ?? ''); ?>;
+        
+        if (existingContent && typeof richTextEditor !== 'undefined' && richTextEditor) {
+            richTextEditor.editor.innerHTML = existingContent;
+            richTextEditor.syncContent();
+            richTextEditor.updateWordCount();
+        }
+    }, 100);
 });
 
 // Character counter for title
-document.getElementById('title').addEventListener('input', function() {
-    const remaining = 200 - this.value.length;
-    const small = this.parentNode.querySelector('small');
-    small.textContent = `${remaining} characters remaining`;
-    if (remaining < 20) {
-        small.style.color = '#e74c3c';
-    } else {
-        small.style.color = '#6c757d';
+document.addEventListener('DOMContentLoaded', function() {
+    const titleInput = document.getElementById('title');
+    if (titleInput) {
+        titleInput.addEventListener('input', function() {
+            const remaining = 200 - this.value.length;
+            const small = this.parentNode.querySelector('small');
+            if (small) {
+                small.textContent = `${remaining} characters remaining`;
+                if (remaining < 20) {
+                    small.style.color = '#e74c3c';
+                } else {
+                    small.style.color = '#6c757d';
+                }
+            }
+        });
     }
 });
 
+// Form submission handler to ensure content is synced
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // Ensure rich text editor content is synced before submission
+            if (typeof richTextEditor !== 'undefined' && richTextEditor) {
+                richTextEditor.syncContent();
+                
+                // Check if content is empty
+                const contentTextarea = document.getElementById('content-textarea');
+                if (contentTextarea && !contentTextarea.value.trim()) {
+                    e.preventDefault();
+                    alert('Please enter some content in your diary entry.');
+                    // Focus on the rich text editor
+                    if (richTextEditor.editor) {
+                        richTextEditor.editor.focus();
+                    }
+                    return false;
+                }
+                
+                console.log('Form submitted with content:', contentTextarea ? contentTextarea.value : '');
+            } else {
+                console.error('Rich text editor not initialized');
+                e.preventDefault();
+                alert('Rich text editor is not properly initialized. Please refresh the page and try again.');
+                return false;
+            }
+            
+            // Additional validation for other required fields
+            const title = document.getElementById('title');
+            const mood = document.getElementById('mood');
+            const entryDate = document.getElementById('entry_date');
+            
+            if (title && !title.value.trim()) {
+                e.preventDefault();
+                alert('Please enter a title for your diary entry.');
+                title.focus();
+                return false;
+            }
+            
+            if (mood && !mood.value) {
+                e.preventDefault();
+                alert('Please select your mood.');
+                mood.focus();
+                return false;
+            }
+            
+            if (entryDate && !entryDate.value) {
+                e.preventDefault();
+                alert('Please select a date for your entry.');
+                entryDate.focus();
+                return false;
+            }
+        });
+    }
+});
+
+// Debug function to check rich text editor status
+function debugRichTextEditor() {
+    console.log('Rich text editor status:', {
+        initialized: typeof richTextEditor !== 'undefined',
+        editor: richTextEditor ? richTextEditor.editor : null,
+        textarea: document.getElementById('content-textarea'),
+        content: document.getElementById('content-textarea') ? document.getElementById('content-textarea').value : 'N/A'
+    });
+}
+
+// Add debug button (remove in production)
+document.addEventListener('DOMContentLoaded', function() {
+    const debugBtn = document.createElement('button');
+    debugBtn.type = 'button';
+    debugBtn.textContent = 'Debug Editor';
+    debugBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: red; color: white; padding: 5px;';
+    debugBtn.onclick = debugRichTextEditor;
+    document.body.appendChild(debugBtn);
+});
 </script>
 
     </main>
 </body>
 </html> 
+
+<style>
+/* Ensure submit button is clickable */
+.btn {
+    position: relative;
+    z-index: 10;
+}
+
+#submit-btn {
+    position: relative;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+/* Ensure rich text editor doesn't overlap buttons */
+.rich-text-editor {
+    position: relative;
+    z-index: 1;
+}
+
+/* Debug styles - remove in production */
+.debug-info {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    z-index: 10000;
+}
+</style> 

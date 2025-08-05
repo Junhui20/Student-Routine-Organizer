@@ -96,6 +96,14 @@ try {
     backdrop-filter: blur(10px);
 }
 
+.mood-emoji {
+    font-size: 1.2rem;
+}
+
+.mood-text {
+    font-weight: 500;
+}
+
 .entry-view-content {
     padding: 2.5rem;
     font-size: 1.1rem;
@@ -256,9 +264,10 @@ try {
                             'Happy' => '😊', 'Sad' => '😢', 'Excited' => '🎉', 'Stressed' => '😰',
                             'Calm' => '😌', 'Angry' => '😠', 'Grateful' => '🙏', 'Tired' => '😴'
                         ];
-                        echo $mood_emojis[$entry['mood']] ?? '😊';
+                        $mood_emoji = $mood_emojis[$entry['mood']] ?? '😊';
                         ?>
-                        <?php echo htmlspecialchars($entry['mood']); ?>
+                        <span class="mood-emoji"><?php echo $mood_emoji; ?></span>
+                        <span class="mood-text"><?php echo htmlspecialchars($entry['mood']); ?></span>
                     </div>
                 </div>
             </div>
