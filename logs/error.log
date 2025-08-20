@@ -25,3 +25,7 @@ Stack trace:
 URL: /student-routine-organizer/auth/forgot_password.php
 IP: ::1
 
+[2025-08-13 06:38:24] SESSION: Session initialization failed in add_habit.php in :0
+URL: /student-routine-organizer/habits/add_habit.php
+IP: ::1
+

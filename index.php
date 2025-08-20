@@ -269,22 +269,34 @@ if (session_status() == PHP_SESSION_NONE) {
                     <small class="text-muted" style="display: block; margin-top: 1rem;">Developed by Team Member 2</small>
                 </div>
 
+                
                 <!-- Habit Tracker Module -->
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-check-circle"></i>
+                <div class="feature-card" style="border: 3px solid #667eea; position: relative;">
+                    <div style="position: absolute; top: -10px; right: -10px; background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold;">
+                        AVAILABLE
+                    </div>
+                <div class="feature-icon">
+                      <i class="fas fa-check-circle"></i>
                     </div>
                     <h3>Habit Tracker</h3>
                     <p>Build positive routines by setting personal habits and tracking daily progress. Monitor your consistency and growth.</p>
                     <div style="margin-top: 2rem;">
-                        <button class="btn btn-primary" onclick="showComingSoon('Habit Tracker')" style="width: 100%;">
-                            <i class="fas fa-check-circle"></i> Coming Soon
-                        </button>
+                        <?php if(isset($_SESSION['user_id'])): ?>
+                            <a href="habits/index.php" class="btn btn-primary" style="width: 100%; margin-bottom: 0.5rem;">
+                                <i class="fas fa-tasks"></i> View My Habits
+                            </a>
+                            <a href="habits/add_habit.php" class="btn btn-success" style="width: 100%;">
+                                <i class="fas fa-plus"></i> Add New Habit
+                            </a>
+                        <?php else: ?>
+                            <a href="auth/login.php" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-check-circle"></i> Start Tracking Habits
+                            </a>
+                        <?php endif; ?>
                     </div>
-                    <small class="text-muted" style="display: block; margin-top: 1rem;">Developed by Team Member 3</small>
+                    <small style="color: #667eea; font-weight: bold; display: block; margin-top: 1rem;">✅ Fully Functional</small>
                 </div>
             </div>
-        </div>
 
         <?php if(isset($_SESSION['user_id'])): ?>
         <div class="container">
@@ -411,8 +423,8 @@ if (session_status() == PHP_SESSION_NONE) {
                 <div class="feature-card text-center">
                     <div class="feature-icon"><i class="fas fa-check-circle"></i></div>
                     <h4>Habit Tracker</h4>
-                    <p>Team Member 3</p>
-                    <small class="text-muted">In Development</small>
+                    <p><strong>Ng Xue En</strong></p>
+                    <small style="color: #27ae60; font-weight: bold;">In Development</small>
                 </div>
             </div>
         </div>
