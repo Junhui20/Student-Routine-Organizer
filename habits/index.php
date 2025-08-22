@@ -41,15 +41,83 @@ $stmt->execute();
 $res = $stmt->get_result();
 $habits = $res->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
+$q = $_GET['q'] ?? '';
+$filter_category = $_GET['category'] ?? '';
+$filter_status = $_GET['status'] ?? '';
+
+$habits = array_filter($habits, function($h) use ($q, $filter_category, $filter_status) {
+    // Search by name
+    $matches_search = !$q || stripos($h['habit_name'], $q) !== false;
+
+    // Filter by category
+    $matches_cat = !$filter_category || ($h['category'] ?: 'Uncategorized') === $filter_category;
+
+    // Filter by status (active/inactive)
+    $matches_status = true;
+    if ($filter_status === 'active') $matches_status = (int)$h['is_active'] === 1;
+    if ($filter_status === 'inactive') $matches_status = (int)$h['is_active'] === 0;
+
+    return $matches_search && $matches_cat && $matches_status;
+});
+
 
 include '../includes/header.php';
 ?>
+
 
 <div class="container">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
     <h2><i class="fas fa-leaf"></i> Habit Tracker</h2>
     <a href="add_habit.php" class="btn btn-primary"><i class="fas fa-plus"></i> Add Habit</a>
   </div>
+  <div class="habit-controls" style="margin-bottom:2rem;">
+  <!-- Collapsible Header -->
+  <button id="toggleFilterBtn" class="btn btn-primary" style="width:100%;padding:0.5rem;;border:none;border-radius:4px;cursor:pointer;text-align:left;">
+    <i class="fas fa-filter"></i> Search & Filters <span style="float:right;">&#9660;</span>
+  </button>
+
+  <div id="filterPanel" style="display:none;margin-top:0.5rem;">
+  <form id="habitFilterForm" method="get" action="" style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:flex-start;">
+    
+    <!-- Search by habit name -->
+    <input type="text" name="q" placeholder="Search habits..." value="<?= htmlspecialchars($_GET['q'] ?? '') ?>" 
+           style="flex:1 1 200px;padding:0.5rem;border:1px solid #ccc;border-radius:4px;">
+
+    <!-- Filter by category -->
+    <select name="category" style="flex:1 1 200px;padding:0.5rem;border:1px solid #ccc;border-radius:4px;">
+      <option value="">All Categories</option>
+      <?php
+      $cats = ['Physical Health','Mental Health','Spiritual Health','Social Health','Technology','Work','Finance','Home','Sleep','Creativity','Uncategorized'];
+      foreach ($cats as $cat_option) {
+          $selected = (isset($_GET['category']) && $_GET['category'] === $cat_option) ? 'selected' : '';
+          echo "<option value=\"" . htmlspecialchars($cat_option) . "\" $selected>" . htmlspecialchars($cat_option) . "</option>";
+      }
+      ?>
+    </select>
+
+    <!-- Filter by active/inactive -->
+    <select name="status" style="flex:1 1 150px;padding:0.5rem;border:1px solid #ccc;border-radius:4px;">
+      <option value="">All Status</option>
+      <option value="active" <?= (isset($_GET['status']) && $_GET['status'] === 'active') ? 'selected' : '' ?>>Active</option>
+      <option value="inactive" <?= (isset($_GET['status']) && $_GET['status'] === 'inactive') ? 'selected' : '' ?>>Inactive</option>
+    </select>
+
+    <!-- Apply Filters -->
+    <button type="submit" style="flex:1 1 48%;padding:0.5rem;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-search"></i> Apply Filters
+    </button>
+
+    <!-- Reset Filters -->
+    <button type="button" id="resetFiltersBtn" 
+            style="flex:1 1 48%;padding:0.5rem;background:#6c757d;color:#fff;border:none;border-radius:4px;cursor:pointer;">
+      <i class="fas fa-redo"></i> Reset Filters
+    </button>
+
+  </form>
+</div>
+
+
+
 
   <?php
   $current_cat = '';
@@ -66,7 +134,7 @@ include '../includes/header.php';
           }
           // card
           ?>
-          <div class="entry-card" data-habit-id="<?= (int)$h['habit_id'] ?>" style="width:320px;padding:1rem;border:1px solid #eee;border-radius:8px;">
+          <div class="entry-card" data-habit-id="<?= (int)$h['habit_id'] ?>" style="width:500px;padding:1.5rem;border:1px solid #eee;border-radius:8px;">
             <div class="entry-header">
               <h4><?= htmlspecialchars($h['habit_name']) ?></h4>
               <div class="entry-meta">
@@ -85,10 +153,10 @@ include '../includes/header.php';
 
 
             <?php if (!empty($h['description'])): ?>
-              <div class="entry-content" style="margin-top:.5rem;"><?= nl2br(htmlspecialchars($h['description'])) ?></div>
+              <div class="entry-content" style="margin-top:.6rem;"><?= nl2br(htmlspecialchars($h['description'])) ?></div>
             <?php endif; ?>
 
-            <div style="display:flex;gap:.5rem;margin-top:.75rem;align-items:center;">
+            <div class="habit-actions" style="display:flex;gap:.5rem;margin-top:.75rem;">
               <?php if ((int)$h['done_today'] === 1): ?>
                 <form method="post" action="toggle_today.php" style="display:inline;">
                   <input type="hidden" name="habit_id" value="<?= (int)$h['habit_id'] ?>">
@@ -112,16 +180,16 @@ include '../includes/header.php';
 
               <a class="btn btn-warning btn-small" href="edit_habit.php?id=<?= (int)$h['habit_id'] ?>"><i class="fas fa-edit"></i> Edit</a>
               
-              <a class="btn btn-info btn-small" href="habits_detail.php?id=<?= (int)$h['habit_id'] ?>">
-  <i class="fas fa-history"></i> History
-</a>
-
+              
 
               <!-- delete uses a small POST form -->
               <form method="post" action="delete_habit.php" style="display:inline;">
                 <input type="hidden" name="id" value="<?= (int)$h['habit_id'] ?>">
                 <button class="btn btn-danger btn-small" onclick="return confirm('Delete? This removes logs too.')"><i class="fas fa-trash"></i> Delete</button>
               </form>
+
+              <a class="btn btn-info btn-small" href="habits_detail.php?id=<?= (int)$h['habit_id'] ?>"><i class="fas fa-history"></i> History</a>
+
             </div>
           </div>
           <?php
@@ -247,5 +315,66 @@ function stopAndLogTimer(autoExpired) {
       alert('Could not log time. Try again.');
     });
 }
+</script>
+<style>
+/* Force all habit action buttons same style/size */
+.habit-actions .btn,
+.habit-actions form button {
+  width: 100%;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.1rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* ensure icons have spacing */
+.habit-actions .btn i {
+  margin-right: 6px;
+}
+
+
+
+/* explicitly style the history/info button */
+.habit-actions .btn-info {
+  background-color: #474747ff !important;
+  color: #fff !important;
+}
+
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('toggleFilterBtn');
+    const panel = document.getElementById('filterPanel');
+
+    if (toggleBtn && panel) {
+        toggleBtn.addEventListener('click', function() {
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'block';
+                this.querySelector('span').innerHTML = '&#9650;'; // arrow up
+            } else {
+                panel.style.display = 'none';
+                this.querySelector('span').innerHTML = '&#9660;'; // arrow down
+            }
+        });
+    }
+});
+</script>
+<script>
+document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+  const form = document.getElementById('habitFilterForm');
+  
+  // Clear all input/select fields
+  form.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+  form.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+  
+  // Submit the form automatically
+  form.submit();
+});
 </script>
 
