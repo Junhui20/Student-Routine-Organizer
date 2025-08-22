@@ -135,11 +135,11 @@ if (session_status() == PHP_SESSION_NONE) {
                         <a href="../diary/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/diary/') !== false) ? 'active' : ''; ?>">
                             <i class="fas fa-journal-whills"></i> Diary
                         </a>
-                        <a href="../tasks/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/tasks/') !== false) ? 'active' : ''; ?>">
-                            <i class="fas fa-tasks"></i> Tasks
+                        <a href="../exercises/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/tasks/') !== false) ? 'active' : ''; ?>">
+                            <i class="fa-solid fa-person-walking"></i> Exercises
                         </a>
-                        <a href="../schedule/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/schedule/') !== false) ? 'active' : ''; ?>">
-                            <i class="fas fa-calendar-alt"></i> Schedule
+                        <a href="../habits/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/schedule/') !== false) ? 'active' : ''; ?>">
+                            <i class="fas fa-leaf"></i> Schedule
                         </a>
                         <a href="../notes/index.php" class="nav-link <?php echo (strpos($_SERVER['REQUEST_URI'], '/notes/') !== false) ? 'active' : ''; ?>">
                             <i class="fas fa-sticky-note"></i> Notes

@@ -5,9 +5,9 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // --- DB connection (mysqli) ---
-$host   = "localhost";
-$user   = "root";
-$pass   = "";
+$host = "localhost";
+$user = "root";
+$pass = "";
 $dbname = "student_routine_db";
 
 $conn = new mysqli($host, $user, $pass, $dbname);
@@ -18,7 +18,8 @@ if ($conn->connect_error) {
 $conn->set_charset('utf8mb4');
 
 // central login guard
-function require_login(): void {
+function require_login(): void
+{
     if (!isset($_SESSION['user_id'])) {
         header("Location: ../auth/login.php");
         exit();
@@ -26,17 +27,20 @@ function require_login(): void {
 }
 
 
-function current_user_id(): int {
-    return (int)($_SESSION['user_id'] ?? 0);
+function current_user_id(): int
+{
+    return (int) ($_SESSION['user_id'] ?? 0);
 }
 
-function db(): mysqli {
+function db(): mysqli
+{
     global $conn;
     return $conn;
 }
 
 // Ownership check 
-function habit_belongs_to_user(int $habit_id): bool {
+function habit_belongs_to_user(int $habit_id): bool
+{
     $c = db();
     $uid = current_user_id();
     $stmt = $c->prepare("SELECT habit_id FROM habits WHERE habit_id = ? AND user_id = ?");

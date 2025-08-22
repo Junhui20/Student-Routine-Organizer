@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$habit_id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+$habit_id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 if ($habit_id <= 0 || !habit_belongs_to_user($habit_id)) {
     header("Location: index.php");
     exit();
