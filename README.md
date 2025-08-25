@@ -13,7 +13,7 @@ This project is developed by **4 team members**, each responsible for one module
 | 🏃‍♂️ **Exercise Tracker** | Team Member 1 | In Development |
 | 📖 **Diary Journal** | **Hui** | ✅ **Need Check** |
 | 💰 **Money Tracker** | Team Member 2 | In Development |
-| ✅ **Habit Tracker** | Team Member 3 | In Development |
+| ✅ **Habit Tracker** | Ng Xue En | ✅ **Need Check** |
 
 ## 🎯 Module: Diary Journal
 
@@ -28,6 +28,27 @@ For the **Diary Journal Module**, which includes:
 - **Mood Tracking** with 8 different mood options
 - **Entry History** sorted by date (newest first)
 - **User Statistics** showing total entries and weekly count
+
+## 🎯 Module: Habit Trcaker
+
+For the **Habit Tracker Module**, which includes:
+
+### ✅ Features Implemented
+- **User Registration & Authentication** (shared across all modules)
+- **Create** new habits with name, description, category, frequency, type (regular/timer), and start date
+- **Read** all habits grouped by category with progress visualization
+- **Update** habits with pre-populated forms for easy editing
+- **Delete** habits with confirmation, removing associated logs as well
+- **Daily Logging** with Mark/Unmark Today action to track completion
+- **Streak Tracking** showing continuous days completed
+- **Weekly Progress Bar** with percentage indicator for last 7 days
+- **Timer Functionality** for duration-based habits, with auto-log when stopped
+- **History Log** of past completions with details and status
+- **Search & Filter** habits by name, category, and status with collapsible filter bar
+
+
+
+ 
 
 ### 🔧 Technical Implementation
 - **3-Tier Architecture**:
@@ -65,7 +86,14 @@ student-routine-organizer/
 │   ├── edit_exercise.php     # Edit workout activities record (UPDATE)
 │   └── delete_exercise.php   # Delete workout activities record (DELETE)
 ├── money/                    # Team Member 2's module (placeholder)
-├── habits/                   # Team Member 3's module (placeholder)
+├── habits/                   # Habit module 
+│   ├── index.php             # View habit dashboard (READ)
+│   ├── add_habit.php         # Add habit (CREATE)
+│   ├── edit_habit.php        # Edit habit (UPDATE)
+│   ├── delete_habit.php      # Delete habit (DELETE)
+│   ├── toggle_today.php      # Toggle (mark/unmark) a habit for today
+│   ├── habit_detail.php      # Display details for a single habit
+│   └── habit_fucntions.php   # Core db & authorisation
 ├── css/
 │   └── style.css             # Shared styling
 ├── index.php                 # Main dashboard
@@ -125,6 +153,7 @@ student-routine-organizer/
 ✅ **Web Application**: Accessible via web browser  
 ✅ **Module Specific Features**: Diary journaling with mood tracking  
 ✅ **Module Specific Features**: Exercise Tracker with workout activities tracking  
+✅ **Module Specific Features**: Habit Tracker with progress tracking 
 
 ## 🤝 Integration with Team
 
