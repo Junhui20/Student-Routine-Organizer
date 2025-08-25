@@ -6,33 +6,64 @@
 
 ## 👥 Team Structure
 
-This project is developed by **4 team members**, each responsible for one module:
+This project is developed by **4 team members**, each responsible for one module, plus an **Admin** utility area. All modules are available and functional:
 
 | Module | Developer | Status |
 |--------|-----------|---------|
-| 🏃‍♂️ **Exercise Tracker** | Team Member 1 | In Development |
-| 📖 **Diary Journal** | **Hui** | ✅ **Need Check** |
-| 💰 **Money Tracker** | Team Member 2 | In Development |
-| ✅ **Habit Tracker** | Ng Xue En | ✅ **Need Check** |
+| 🏃‍♂️ **Exercise Tracker** | Jooyee | ✅ Complete |
+| 📖 **Diary Journal** | JunHui | ✅ Complete |
+| 💰 **Money Tracker** | Wilson | ✅ Complete |
+| ✅ **Habit Tracker** | Ng Xue En | ✔️ Need Testing|
+| 🛠️ **Admin** | Wilson | ✔️ Need Testing |
+
+## 🎯 Module: Exercise Tracker
+
+For the **Exercise Tracker**, which includes:
+### ✅ Features Implemented
+- **Create** workout records with type, date, duration, calories, optional time and notes
+- **Read** history with responsive cards and details
+- **Update/Delete** existing exercise records with confirmation
+- **Filter & Search** by date range, type, duration, calories; clear/summary of active filters
+- **Sort** by date, duration, calories, or type
+- **Statistics**: totals (workouts, minutes, calories) and 7‑day summary; average duration
+
+## 🎯 Module: Money Tracker
+
+For the **Money Tracker**, which includes:
+### ✅ Features Implemented
+- **Create** income/expense transactions with category and description
+- **Read** paginated transaction history with styled cards
+- **Update/Delete** transactions with ownership checks
+- **Filters** by month, type (income/expense), and category
+- **Summaries**: overall totals (income, expenses, balance) and current month breakdown
+- **Badges** and color‑coded amounts for quick scanning
+
+## 🎯 Module: Admin
+
+For the **Admin**, which includes:
+### ✅ Features Implemented
+- **Admin Authentication** with dedicated login/logout
+- **Dashboard** overview for administrative actions
+- **User Management**: view/manage users (`admin/users.php`)
+- **Settings** management (`admin/settings.php`)
+- **Backup** utility (`admin/backup.php`)
+- **Error Review** page for logged errors (`admin/errors.php`, integrates with `logs/error.log`)
 
 ## 🎯 Module: Diary Journal
 
 For the **Diary Journal Module**, which includes:
-
 ### ✅ Features Implemented
-- **User Registration & Authentication** (shared across all modules)
-- **Create** new diary entries with title, date, mood, and content
-- **Read** all diary entries with proper formatting and sorting
+- **User Registration & Authentication** (shared)
+- **Create** new diary entries with title, date, mood, and rich-text content
+- **Read** entries list with search/filter component and calendar view
 - **Update** existing entries with pre-populated forms
 - **Delete** entries with confirmation and security checks
-- **Mood Tracking** with 8 different mood options
-- **Entry History** sorted by date (newest first)
-- **User Statistics** showing total entries and weekly count
+- **Mood tracking** with multiple mood options and badges
+- **History & sorting** by date (newest first)
 
-## 🎯 Module: Habit Trcaker
+## 🎯 Module: Habit Tracker
 
 For the **Habit Tracker Module**, which includes:
-
 ### ✅ Features Implemented
 - **User Registration & Authentication** (shared across all modules)
 - **Create** new habits with name, description, category, frequency, type (regular/timer), and start date
@@ -46,36 +77,44 @@ For the **Habit Tracker Module**, which includes:
 - **History Log** of past completions with details and status
 - **Search & Filter** habits by name, category, and status with collapsible filter bar
 
-
-
  
 
 ### 🔧 Technical Implementation
-- **3-Tier Architecture**:
+- **3-Tier Architecture**
   - **Presentation Layer**: HTML/CSS/JavaScript frontend
   - **Business Logic Layer**: PHP processing and validation
   - **Data Layer**: MySQL database with relationships
-- **Security Features**:
+- **Security Features**
   - Password hashing with PHP's `password_hash()`
-  - SQL injection prevention with prepared statements
-  - User session management
+  - SQL injection prevention with prepared statements (PDO/MySQLi)
+  - Advanced session management, login attempt tracking, remember-me cookies
   - Data validation and sanitization
+- **Password Reset**: Token-based flow with `password_reset_tokens` table (see `PASSWORD_RESET_SETUP.md`)
 - **Responsive Design** with modern UI/UX
 
 ## 📁 Project Structure
 
 ```
 student-routine-organizer/
+├── admin/
+│   ├── dashboard.php         # Admin dashboard (user management/settings)
+│   └── users.php             # Admin: users list
 ├── config/
-│   └── database.php           # Database connection (shared)
+│   └── database.php          # Database connection (shared)
 ├── includes/
 │   ├── header.php            # Common header with navigation
-│   └── footer.php            # Common footer
-├── auth/                     # Authentication system (shared)
+│   ├── footer.php            # Common footer
+│   ├── SessionManager.php    # Advanced session handling
+│   ├── CookieManager.php     # Remember-me cookie management
+│   ├── ErrorHandler.php      # Centralized error logging
+│   └── PasswordResetHandler.php # Password reset logic
+├── auth/
 │   ├── login.php             # User login
 │   ├── register.php          # User registration
-│   └── logout.php            # Logout functionality
-├── diary/                    # YOUR MODULE
+│   ├── logout.php            # Logout
+│   ├── forgot_password.php   # Start password reset
+│   └── reset_password.php    # Complete password reset
+├── diary/
 │   ├── index.php             # View entries (READ)
 │   ├── add_entry.php         # Add entry (CREATE)
 │   ├── edit_entry.php        # Edit entry (UPDATE)
@@ -85,7 +124,10 @@ student-routine-organizer/
 │   ├── add_exercise.php      # Add workout activities (CREATE)
 │   ├── edit_exercise.php     # Edit workout activities record (UPDATE)
 │   └── delete_exercise.php   # Delete workout activities record (DELETE)
-├── money/                    # Team Member 2's module (placeholder)
+├── money/
+│   ├── index.php             # Finance dashboard + filters + pagination
+│   ├── add_transaction.php   # Add income/expense
+│   └── edit_transaction.php  # Edit transaction
 ├── habits/                   # Habit module 
 │   ├── index.php             # View habit dashboard (READ)
 │   ├── add_habit.php         # Add habit (CREATE)
@@ -96,8 +138,11 @@ student-routine-organizer/
 │   └── habit_fucntions.php   # Core db & authorisation
 ├── css/
 │   └── style.css             # Shared styling
+├── logs/
+│   └── error.log             # Error logs (+ password reset email log)
 ├── index.php                 # Main dashboard
-└── database_schema.sql       # Database setup
+├── PASSWORD_RESET_SETUP.md   # Password reset setup and docs
+└── database_schema_clean.sql # Database schema
 ```
 
 ## 🚀 Setup Instructions
@@ -110,7 +155,8 @@ student-routine-organizer/
 1. **Start XAMPP**: Launch Apache and MySQL services
 2. **Create Database**: 
    - Open phpMyAdmin (`http://localhost/phpmyadmin`)
-   - Run the SQL from `database_schema.sql`
+   - Run the SQL from `student_routine_db.sql`
+   - If using password reset, ensure the `password_reset_tokens` table exists (see `PASSWORD_RESET_SETUP.md`)
 3. **Access Application**: Visit `http://localhost/student-routine-organizer/`
 
 ### Test Your Module
@@ -138,10 +184,12 @@ student-routine-organizer/
 
 - Password hashing with PHP's built-in functions
 - Prepared statements to prevent SQL injection
-- Session-based authentication
+- Session-based authentication with rotation and timeouts
 - User data isolation (users only see their own data)
 - Input validation and sanitization
-- Secure password requirements (minimum 6 characters)
+- Secure password requirements (registration: min 6; reset: strong policy)
+- Remember-me cookies with secure handling
+- Password reset tokens with expiration and one-time use
 
 ## 📊 Assignment Requirements Met
 
@@ -151,9 +199,10 @@ student-routine-organizer/
 ✅ **Database Connectivity**: MySQL with proper relationships  
 ✅ **PHP & MySQL**: Server-side processing and data storage  
 ✅ **Web Application**: Accessible via web browser  
-✅ **Module Specific Features**: Diary journaling with mood tracking  
-✅ **Module Specific Features**: Exercise Tracker with workout activities tracking  
-✅ **Module Specific Features**: Habit Tracker with progress tracking 
+✅ **Module Specific Features**: Diary journaling with mood tracking and calendar view  
+✅ **Module Specific Features**: Exercise Tracker with filters, notes, and stats  
+✅ **Module Specific Features**: Money Tracker with summaries, filters, and pagination  
+✅ **Module Specific Features**: Habit Tracker with streaks, timers, and history 
 
 ## 🤝 Integration with Team
 

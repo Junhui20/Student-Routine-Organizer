@@ -351,17 +351,7 @@ include '../includes/header.php';
 
 <div class="container">
     <div class="form-container">
-        <h2><i class="fas fa-plus-circle"></i> Add Transaction (Fixed Version)</h2>
-        
-        <!-- Debug Information -->
-        <div class="debug-info">
-            <h4>🔍 Debug Information</h4>
-            <ul>
-                <?php foreach ($debugInfo as $info): ?>
-                    <li><?php echo htmlspecialchars($info); ?></li>
-                <?php endforeach; ?>
-            </ul>
-        </div>
+        <h2><i class="fas fa-plus-circle"></i> Add Transaction</h2>
         
         <?php if ($message): ?>
             <div class="alert alert-<?php echo $messageType; ?>">
