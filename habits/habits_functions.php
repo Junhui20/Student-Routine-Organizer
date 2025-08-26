@@ -1,5 +1,4 @@
 <?php
-
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -14,7 +13,6 @@ $conn = new mysqli($host, $user, $pass, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-// ensure utf8mb4
 $conn->set_charset('utf8mb4');
 
 // central login guard
@@ -26,10 +24,9 @@ function require_login(): void
     }
 }
 
-
 function current_user_id(): int
 {
-    return (int) ($_SESSION['user_id'] ?? 0);
+    return (int)($_SESSION['user_id'] ?? 0);
 }
 
 function db(): mysqli
@@ -43,11 +40,39 @@ function habit_belongs_to_user(int $habit_id): bool
 {
     $c = db();
     $uid = current_user_id();
-    $stmt = $c->prepare("SELECT habit_id FROM habits WHERE habit_id = ? AND user_id = ?");
+    $stmt = $c->prepare("SELECT habit_id FROM habits WHERE habit_id=? AND user_id=?");
     $stmt->bind_param("ii", $habit_id, $uid);
     $stmt->execute();
     $stmt->store_result();
     $ok = $stmt->num_rows > 0;
     $stmt->close();
     return $ok;
+}
+
+// Check if a habit is active
+function habit_is_active(int $habit_id): bool
+{
+    $c = db();
+    $uid = current_user_id();
+
+    $stmt = $c->prepare("
+        SELECT is_active, end_date 
+        FROM habits 
+        WHERE habit_id = ? AND user_id = ?
+    ");
+    $stmt->bind_param("ii", $habit_id, $uid);
+    $stmt->execute();
+    $stmt->bind_result($is_active, $end_date);
+    if (!$stmt->fetch()) {
+        $stmt->close();
+        return false; // habit not found → treat as inactive
+    }
+    $stmt->close();
+
+    // If end_date is set and today is after it, treat inactive
+    if ($end_date && strtotime(date('Y-m-d')) > strtotime($end_date)) {
+        return false;
+    }
+
+    return (int)$is_active === 1;
 }

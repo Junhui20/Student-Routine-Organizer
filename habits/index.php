@@ -169,27 +169,35 @@ include '../includes/header.php';
           <?php endif; ?>
 
           <div class="habit-actions" style="display:flex;gap:.5rem;margin-top:.75rem;">
-            <?php if ((int) $h['done_today'] === 1): ?>
-              <form method="post" action="toggle_today.php" style="display:inline;">
-                <input type="hidden" name="habit_id" value="<?= (int) $h['habit_id'] ?>">
-                <input type="hidden" name="action" value="unmark">
-                <button class="btn btn-secondary btn-small" type="submit"><i class="fas fa-undo"></i> Unmark</button>
-              </form>
+            <?php if ((int) $h['is_active'] === 0): ?>
+              <!-- Inactive habit: show disabled button -->
+              <button class="btn btn-secondary btn-small" disabled>
+                <i class="fas fa-ban"></i> Inactive
+              </button>
             <?php else: ?>
-              <?php if ($h['habit_type'] === 'timer'): ?>
-                <button class="btn btn-success btn-small"
-                  onclick="openTimer(<?= (int) $h['habit_id'] ?>, <?= (int) ($h['timer_duration'] ?? 0) ?>)">
-                  <i class="fas fa-play"></i> Start (<?= (int) ($h['timer_duration'] ?? 0) ?> min)
-                </button>
-              <?php else: ?>
+              <?php if ((int) $h['done_today'] === 1): ?>
                 <form method="post" action="toggle_today.php" style="display:inline;">
                   <input type="hidden" name="habit_id" value="<?= (int) $h['habit_id'] ?>">
-                  <input type="hidden" name="action" value="mark">
-                  <input type="hidden" name="status" value="done">
-                  <button class="btn btn-success btn-small" type="submit"><i class="fas fa-check"></i> Mark Done</button>
+                  <input type="hidden" name="action" value="unmark">
+                  <button class="btn btn-secondary btn-small" type="submit"><i class="fas fa-undo"></i> Unmark</button>
                 </form>
+              <?php else: ?>
+                <?php if ($h['habit_type'] === 'timer'): ?>
+                  <button class="btn btn-success btn-small"
+                    onclick="openTimer(<?= (int) $h['habit_id'] ?>, <?= (int) ($h['timer_duration'] ?? 0) ?>)">
+                    <i class="fas fa-play"></i> Start (<?= (int) ($h['timer_duration'] ?? 0) ?> min)
+                  </button>
+                <?php else: ?>
+                  <form method="post" action="toggle_today.php" style="display:inline;">
+                    <input type="hidden" name="habit_id" value="<?= (int) $h['habit_id'] ?>">
+                    <input type="hidden" name="action" value="mark">
+                    <input type="hidden" name="status" value="done">
+                    <button class="btn btn-success btn-small" type="submit"><i class="fas fa-check"></i> Mark Done</button>
+                  </form>
+                <?php endif; ?>
               <?php endif; ?>
             <?php endif; ?>
+
 
             <a class="btn btn-warning btn-small" href="edit_habit.php?id=<?= (int) $h['habit_id'] ?>"><i
                 class="fas fa-edit"></i> Edit</a>
@@ -243,6 +251,11 @@ include '../includes/header.php';
     let _timerDefaultSeconds = 0; // store initial total for elapsed calculation
 
     function openTimer(habitId, defaultMinutes) {
+      const habitCard = document.querySelector(`.entry-card[data-habit-id='${habitId}']`);
+      if (habitCard && habitCard.querySelector('.btn-secondary[disabled]')) {
+        alert('This habit is inactive. Reactivate to start timer.');
+        return;
+      }
       timerHabitId = habitId;
       const title = document.getElementById('timerTitle');
       title.textContent = 'Habit #' + habitId;

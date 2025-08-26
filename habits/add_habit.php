@@ -6,67 +6,63 @@ $error = '';
 $default_date = date('Y-m-d');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $habit_name = trim($_POST['habit_name'] ?? '');
-  $description = trim($_POST['description'] ?? '');
-  $frequency = $_POST['frequency'] ?? '';
-  $start_date = $_POST['start_date'] ?? '';
-  $end_date = $_POST['end_date'] ?? '';
-  $category = trim($_POST['category'] ?? 'Uncategorized');
-  $habit_type = $_POST['habit_type'] ?? 'normal';
-  $timer_duration = isset($_POST['timer_duration']) && $_POST['timer_duration'] !== '' ? (int) $_POST['timer_duration'] : null;
-
-  // Validation
-  if ($habit_name === '' || $frequency === '' || $start_date === '' || $end_date === '') {
-    $error = "Habit name, frequency, start date, and end date are required.";
-  } elseif ($start_date < date('Y-m-d')) {
-    $error = "Start date cannot be earlier than today.";
-  } elseif ($end_date < $start_date) {
-    $error = "End date cannot be earlier than start date.";
-  } elseif (mb_strlen($habit_name) > 255) {
-    $error = "Habit name must be 255 characters or less.";
-  } elseif (!in_array($frequency, ['daily', 'weekly', 'custom'], true) || !in_array($habit_type, ['normal', 'timer'], true)) {
-    $error = "Invalid input.";
-  } else {
-    $c = db();
-    $sql = "INSERT INTO habits (user_id, habit_name, description, frequency, start_date, end_date, category, habit_type, timer_duration)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $c->prepare($sql);
-    $uid = current_user_id();
-    $stmt->bind_param("isssssssi", $uid, $habit_name, $description, $frequency, $start_date, $end_date, $category, $habit_type, $timer_duration);
-    if ($stmt->execute()) {
-      header("Location: index.php?added=1");
-      exit();
-    } else {
-      $error = "Failed to add habit. Please try again.";
-    }
-    $stmt->close();
-
+    $habit_name = trim($_POST['habit_name'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+    $frequency = $_POST['frequency'] ?? '';
+    $start_date = $_POST['start_date'] ?? '';
+    $end_date = $_POST['end_date'] ?? '';
+    $category = trim($_POST['category'] ?? 'Uncategorized');
+    $habit_type = $_POST['habit_type'] ?? 'normal';
+    $timer_duration = isset($_POST['timer_duration']) && $_POST['timer_duration'] !== '' ? (int) $_POST['timer_duration'] : null;
     $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-    $sql = "INSERT INTO habits 
-        (user_id, habit_name, description, frequency, start_date, end_date, category, habit_type, timer_duration, is_active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $c->prepare($sql);
-    $uid = current_user_id();
-    $stmt->bind_param(
-      "issssssiii",
-      $uid,
-      $habit_name,
-      $description,
-      $frequency,
-      $start_date,
-      $end_date,
-      $category,
-      $habit_type,
-      $timer_duration,
-      $is_active
-    );
+    // Validation
+    if ($habit_name === '' || $frequency === '' || $start_date === '' || $end_date === '') {
+        $error = "Habit name, frequency, start date, and end date are required.";
+    } elseif ($start_date < date('Y-m-d')) {
+        $error = "Start date cannot be earlier than today.";
+    } elseif ($end_date < $start_date) {
+        $error = "End date cannot be earlier than start date.";
+    } elseif (mb_strlen($habit_name) > 255) {
+        $error = "Habit name must be 255 characters or less.";
+    } elseif (!in_array($frequency, ['daily', 'weekly', 'custom'], true) || !in_array($habit_type, ['normal', 'timer'], true)) {
+        $error = "Invalid input.";
+    } else {
+        $c = db();
 
-  }
+        $sql = "INSERT INTO habits 
+          (user_id, habit_name, description, frequency, start_date, end_date, category, habit_type, timer_duration, is_active)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $stmt = $c->prepare($sql);
+        $uid = current_user_id();
+        $stmt->bind_param(
+          "issssssiii",
+          $uid,
+          $habit_name,
+          $description,
+          $frequency,
+          $start_date,
+          $end_date,
+          $category,
+          $habit_type,
+          $timer_duration,
+          $is_active
+        );
+
+        if ($stmt->execute()) {
+            header("Location: index.php?added=1");
+            exit();
+        } else {
+            $error = "Failed to add habit: " . $stmt->error;
+        }
+        $stmt->close();
+    }
 }
 
 include '../includes/header.php';
 ?>
+<!-- (HTML form same as your version) -->
+
 
 <div class="container">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
@@ -120,8 +116,7 @@ include '../includes/header.php';
       <select name="habit_type" id="habit_type" onchange="toggleTimerInput()" class="form-control"
         style="max-width:250px;">
         <option value="normal" <?= (($_POST['habit_type'] ?? '') === 'normal') ? 'selected' : ''; ?>>Normal</option>
-        <option value="timer" <?= (($_POST['habit_type'] ?? '') === 'timer') ? 'selected' : ''; ?>>Timer (track minutes)
-        </option>
+        <option value="timer" <?= (($_POST['habit_type'] ?? '') === 'timer') ? 'selected' : ''; ?>>Timer (track minutes)</option>
       </select>
     </div>
 
@@ -153,9 +148,8 @@ include '../includes/header.php';
 
     <div class="form-group">
       <label>Active</label>
-      <input type="checkbox" name="is_active" checked>
+      <input type="checkbox" name="is_active" <?= isset($_POST['is_active']) ? 'checked' : 'checked' ?>>
     </div>
-
 
     <div style="display:flex;gap:1rem;">
       <button class="btn btn-success" type="submit">Save Habit</button>
@@ -170,33 +164,21 @@ include '../includes/header.php';
     document.getElementById('timer_block').style.display = v === 'timer' ? 'block' : 'none';
   }
 
-  // Get inputs
   const startInput = document.querySelector('input[name="start_date"]');
   const endInput = document.querySelector('input[name="end_date"]');
-
-  // Get today's date in YYYY-MM-DD
   const today = new Date().toISOString().split('T')[0];
-
-  // Set min for start date (cannot be before today)
   startInput.min = today;
 
-  // On start date change
   startInput.addEventListener('change', () => {
-    // Ensure start date is not before today
     if (startInput.value < today) {
       startInput.value = today;
     }
-
-    // Set min for end date
     endInput.min = startInput.value;
-
-    // Adjust end date if current value is before start date
     if (endInput.value < startInput.value) {
       endInput.value = startInput.value;
     }
   });
 
-  // On page load, set end date min based on start date
   window.addEventListener('DOMContentLoaded', () => {
     endInput.min = startInput.value;
   });

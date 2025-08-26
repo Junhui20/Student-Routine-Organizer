@@ -161,12 +161,7 @@ CREATE TABLE `error_logs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `error_logs`
---
 
-INSERT INTO `error_logs` (`log_id`, `user_id`, `error_type`, `error_message`, `error_file`, `error_line`, `stack_trace`, `request_uri`, `user_agent`, `ip_address`, `created_at`) VALUES
-(1, 1, 'DATABASE:ERROR', 'Database error in add_habit.php', '', 0, '[{\"file\":\"C:\\\\xampp\\\\htdocs\\\\Student-Routine-Organizer\\\\includes\\\\ErrorHandler.php\",\"line\":193,\"function\":\"logApplicationError\",\"class\":\"ErrorHandler\",\"type\":\"::\"},{\"file\":\"C:\\\\xampp\\\\htdocs\\\\Student-Routine-Organizer\\\\diary\\\\add_entry.php\",\"line\":62,\"function\":\"logDatabaseError\",\"class\":\"ErrorHandler\",\"type\":\"::\"}]', '/student-routine-organizer/diary/add_entry.php', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0', '::1', '2025-08-25 16:23:52'),
-(2, 1, 'DATABASE:ERROR', 'Database error in add_habit.php', '', 0, '[{\"file\":\"C:\\\\xampp\\\\htdocs\\\\Student-Routine-Organizer\\\\includes\\\\ErrorHandler.php\",\"line\":193,\"function\":\"logApplicationError\",\"class\":\"ErrorHandler\",\"type\":\"::\"},{\"file\":\"C:\\\\xampp\\\\htdocs\\\\Student-Routine-Organizer\\\\diary\\\\add_entry.php\",\"line\":62,\"function\":\"logDatabaseError\",\"class\":\"ErrorHandler\",\"type\":\"::\"}]', '/student-routine-organizer/diary/add_entry.php', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 Edg/139.0.0.0', '::1', '2025-08-25 16:23:58');
 
 -- --------------------------------------------------------
 
