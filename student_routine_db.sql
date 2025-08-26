@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- 主机： 127.0.0.1
--- 生成日期： 2025-08-25 19:31:28
--- 服务器版本： 10.4.32-MariaDB
--- PHP 版本： 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Aug 26, 2025 at 04:34 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- 数据库： `student_routine_db`
+-- Database: `student_routine_db`
 --
 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `admin_activity_log`
+-- Table structure for table `admin_activity_log`
 --
 
 CREATE TABLE `admin_activity_log` (
@@ -42,7 +42,7 @@ CREATE TABLE `admin_activity_log` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `admin_sessions`
+-- Table structure for table `admin_sessions`
 --
 
 CREATE TABLE `admin_sessions` (
@@ -58,7 +58,7 @@ CREATE TABLE `admin_sessions` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `admin_users`
+-- Table structure for table `admin_users`
 --
 
 CREATE TABLE `admin_users` (
@@ -75,7 +75,7 @@ CREATE TABLE `admin_users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `admin_users`
+-- Dumping data for table `admin_users`
 --
 
 INSERT INTO `admin_users` (`admin_id`, `username`, `email`, `password`, `role`, `is_active`, `created_at`, `last_login`, `login_attempts`, `locked_until`) VALUES
@@ -85,7 +85,7 @@ INSERT INTO `admin_users` (`admin_id`, `username`, `email`, `password`, `role`, 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `categories`
+-- Table structure for table `categories`
 --
 
 CREATE TABLE `categories` (
@@ -96,7 +96,7 @@ CREATE TABLE `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `categories`
+-- Dumping data for table `categories`
 --
 
 INSERT INTO `categories` (`category_id`, `category_name`, `category_type`, `created_at`) VALUES
@@ -117,7 +117,7 @@ INSERT INTO `categories` (`category_id`, `category_name`, `category_type`, `crea
 -- --------------------------------------------------------
 
 --
--- 表的结构 `diary_entries`
+-- Table structure for table `diary_entries`
 --
 
 CREATE TABLE `diary_entries` (
@@ -132,7 +132,7 @@ CREATE TABLE `diary_entries` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `diary_entries`
+-- Dumping data for table `diary_entries`
 --
 
 INSERT INTO `diary_entries` (`entry_id`, `user_id`, `title`, `content`, `mood`, `entry_date`, `created_at`, `updated_at`) VALUES
@@ -143,7 +143,7 @@ INSERT INTO `diary_entries` (`entry_id`, `user_id`, `title`, `content`, `mood`, 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `error_logs`
+-- Table structure for table `error_logs`
 --
 
 CREATE TABLE `error_logs` (
@@ -160,13 +160,10 @@ CREATE TABLE `error_logs` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
-
-
 -- --------------------------------------------------------
 
 --
--- 表的结构 `exercises`
+-- Table structure for table `exercises`
 --
 
 CREATE TABLE `exercises` (
@@ -177,7 +174,7 @@ CREATE TABLE `exercises` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `exercises`
+-- Dumping data for table `exercises`
 --
 
 INSERT INTO `exercises` (`id`, `category`, `exercise_name`, `met_value`) VALUES
@@ -216,7 +213,7 @@ INSERT INTO `exercises` (`id`, `category`, `exercise_name`, `met_value`) VALUES
 -- --------------------------------------------------------
 
 --
--- 表的结构 `exercise_tracker`
+-- Table structure for table `exercise_tracker`
 --
 
 CREATE TABLE `exercise_tracker` (
@@ -234,7 +231,7 @@ CREATE TABLE `exercise_tracker` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `exercise_tracker`
+-- Dumping data for table `exercise_tracker`
 --
 
 INSERT INTO `exercise_tracker` (`exercise_id`, `user_id`, `exercise_ref_id`, `exercise_type`, `duration_minutes`, `calories_burned`, `exercise_date`, `created_at`, `updated_at`, `exercise_time`, `notes`) VALUES
@@ -248,7 +245,60 @@ INSERT INTO `exercise_tracker` (`exercise_id`, `user_id`, `exercise_ref_id`, `ex
 -- --------------------------------------------------------
 
 --
--- 表的结构 `money_categories`
+-- Table structure for table `habits`
+--
+
+CREATE TABLE `habits` (
+  `habit_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `habit_name` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `frequency` enum('daily','weekly','custom') DEFAULT 'daily',
+  `start_date` date NOT NULL,
+  `end_date` date DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `category` varchar(100) DEFAULT NULL,
+  `habit_type` enum('normal','timer') DEFAULT 'normal',
+  `timer_duration` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `habits`
+--
+
+INSERT INTO `habits` (`habit_id`, `user_id`, `habit_name`, `description`, `frequency`, `start_date`, `end_date`, `is_active`, `created_at`, `updated_at`, `category`, `habit_type`, `timer_duration`) VALUES
+(2, 2, 'Drink 8 cups of water a day', 'Go drink now!', 'daily', '2025-08-26', '2025-08-30', 0, '2025-08-26 14:15:48', '2025-08-26 14:21:28', 'Uncategorized', 'normal', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `habit_logs`
+--
+
+CREATE TABLE `habit_logs` (
+  `log_id` int(11) NOT NULL,
+  `habit_id` int(11) NOT NULL,
+  `log_date` date NOT NULL,
+  `status` enum('done','skipped') NOT NULL DEFAULT 'done',
+  `note` varchar(255) DEFAULT NULL,
+  `duration_minutes` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `duration` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `habit_logs`
+--
+
+INSERT INTO `habit_logs` (`log_id`, `habit_id`, `log_date`, `status`, `note`, `duration_minutes`, `created_at`, `duration`) VALUES
+(4, 2, '2025-08-26', 'done', NULL, 0, '2025-08-26 14:15:51', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `money_categories`
 --
 
 CREATE TABLE `money_categories` (
@@ -261,7 +311,7 @@ CREATE TABLE `money_categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `money_categories`
+-- Dumping data for table `money_categories`
 --
 
 INSERT INTO `money_categories` (`category_id`, `type`, `category_name`, `icon`, `color`, `is_active`) VALUES
@@ -286,7 +336,7 @@ INSERT INTO `money_categories` (`category_id`, `type`, `category_name`, `icon`, 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `money_transactions`
+-- Table structure for table `money_transactions`
 --
 
 CREATE TABLE `money_transactions` (
@@ -302,7 +352,7 @@ CREATE TABLE `money_transactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `money_transactions`
+-- Dumping data for table `money_transactions`
 --
 
 INSERT INTO `money_transactions` (`transaction_id`, `user_id`, `type`, `amount`, `category`, `description`, `transaction_date`, `created_at`, `updated_at`) VALUES
@@ -317,7 +367,7 @@ INSERT INTO `money_transactions` (`transaction_id`, `user_id`, `type`, `amount`,
 -- --------------------------------------------------------
 
 --
--- 表的结构 `password_reset_tokens`
+-- Table structure for table `password_reset_tokens`
 --
 
 CREATE TABLE `password_reset_tokens` (
@@ -336,7 +386,7 @@ CREATE TABLE `password_reset_tokens` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `system_settings`
+-- Table structure for table `system_settings`
 --
 
 CREATE TABLE `system_settings` (
@@ -353,7 +403,7 @@ CREATE TABLE `system_settings` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `transactions`
+-- Table structure for table `transactions`
 --
 
 CREATE TABLE `transactions` (
@@ -371,7 +421,7 @@ CREATE TABLE `transactions` (
 -- --------------------------------------------------------
 
 --
--- 表的结构 `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -383,16 +433,17 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转存表中的数据 `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`) VALUES
-(1, 'jhteoh20', 'jhteoh20@1utar.my', '$2y$10$7ugJCsVKS2Tf6YAqKzzTxOzsLhnzFpsr2bVzA9PmWVFnu6OtiBDRu', '2025-08-25 16:18:31');
+(1, 'jhteoh20', 'jhteoh20@1utar.my', '$2y$10$7ugJCsVKS2Tf6YAqKzzTxOzsLhnzFpsr2bVzA9PmWVFnu6OtiBDRu', '2025-08-25 16:18:31'),
+(2, 'unknown', 'xueenng2023@1utar.my', '$2y$10$vR5ZLz96laDToaDVbjQinOZQue0fj5XlyzWZXdqHwIq8jieJ2Yv92', '2025-08-26 13:30:47');
 
 -- --------------------------------------------------------
 
 --
--- 表的结构 `user_remember_tokens`
+-- Table structure for table `user_remember_tokens`
 --
 
 CREATE TABLE `user_remember_tokens` (
@@ -407,11 +458,11 @@ CREATE TABLE `user_remember_tokens` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- 转储表的索引
+-- Indexes for dumped tables
 --
 
 --
--- 表的索引 `admin_activity_log`
+-- Indexes for table `admin_activity_log`
 --
 ALTER TABLE `admin_activity_log`
   ADD PRIMARY KEY (`log_id`),
@@ -420,7 +471,7 @@ ALTER TABLE `admin_activity_log`
   ADD KEY `idx_created` (`created_at`);
 
 --
--- 表的索引 `admin_sessions`
+-- Indexes for table `admin_sessions`
 --
 ALTER TABLE `admin_sessions`
   ADD PRIMARY KEY (`session_id`),
@@ -428,7 +479,7 @@ ALTER TABLE `admin_sessions`
   ADD KEY `idx_expires` (`expires_at`);
 
 --
--- 表的索引 `admin_users`
+-- Indexes for table `admin_users`
 --
 ALTER TABLE `admin_users`
   ADD PRIMARY KEY (`admin_id`),
@@ -438,20 +489,20 @@ ALTER TABLE `admin_users`
   ADD KEY `idx_active` (`is_active`);
 
 --
--- 表的索引 `categories`
+-- Indexes for table `categories`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`category_id`);
 
 --
--- 表的索引 `diary_entries`
+-- Indexes for table `diary_entries`
 --
 ALTER TABLE `diary_entries`
   ADD PRIMARY KEY (`entry_id`),
   ADD KEY `user_id` (`user_id`);
 
 --
--- 表的索引 `error_logs`
+-- Indexes for table `error_logs`
 --
 ALTER TABLE `error_logs`
   ADD PRIMARY KEY (`log_id`),
@@ -460,13 +511,13 @@ ALTER TABLE `error_logs`
   ADD KEY `idx_user_errors` (`user_id`);
 
 --
--- 表的索引 `exercises`
+-- Indexes for table `exercises`
 --
 ALTER TABLE `exercises`
   ADD PRIMARY KEY (`id`);
 
 --
--- 表的索引 `exercise_tracker`
+-- Indexes for table `exercise_tracker`
 --
 ALTER TABLE `exercise_tracker`
   ADD PRIMARY KEY (`exercise_id`),
@@ -476,14 +527,28 @@ ALTER TABLE `exercise_tracker`
   ADD KEY `fk_exercise_ref` (`exercise_ref_id`);
 
 --
--- 表的索引 `money_categories`
+-- Indexes for table `habits`
+--
+ALTER TABLE `habits`
+  ADD PRIMARY KEY (`habit_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `habit_logs`
+--
+ALTER TABLE `habit_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD UNIQUE KEY `uniq_habit_date` (`habit_id`,`log_date`);
+
+--
+-- Indexes for table `money_categories`
 --
 ALTER TABLE `money_categories`
   ADD PRIMARY KEY (`category_id`),
   ADD KEY `idx_type_category` (`type`);
 
 --
--- 表的索引 `money_transactions`
+-- Indexes for table `money_transactions`
 --
 ALTER TABLE `money_transactions`
   ADD PRIMARY KEY (`transaction_id`),
@@ -492,7 +557,7 @@ ALTER TABLE `money_transactions`
   ADD KEY `idx_category` (`category`);
 
 --
--- 表的索引 `password_reset_tokens`
+-- Indexes for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   ADD PRIMARY KEY (`token_id`),
@@ -502,7 +567,7 @@ ALTER TABLE `password_reset_tokens`
   ADD KEY `idx_email` (`email`);
 
 --
--- 表的索引 `system_settings`
+-- Indexes for table `system_settings`
 --
 ALTER TABLE `system_settings`
   ADD PRIMARY KEY (`setting_id`),
@@ -511,7 +576,7 @@ ALTER TABLE `system_settings`
   ADD KEY `system_settings_ibfk_1` (`updated_by`);
 
 --
--- 表的索引 `transactions`
+-- Indexes for table `transactions`
 --
 ALTER TABLE `transactions`
   ADD PRIMARY KEY (`transaction_id`),
@@ -519,7 +584,7 @@ ALTER TABLE `transactions`
   ADD KEY `category_id` (`category_id`);
 
 --
--- 表的索引 `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`user_id`),
@@ -527,7 +592,7 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- 表的索引 `user_remember_tokens`
+-- Indexes for table `user_remember_tokens`
 --
 ALTER TABLE `user_remember_tokens`
   ADD PRIMARY KEY (`token_id`),
@@ -536,155 +601,179 @@ ALTER TABLE `user_remember_tokens`
   ADD KEY `idx_expires` (`expires_at`);
 
 --
--- 在导出的表使用AUTO_INCREMENT
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- 使用表AUTO_INCREMENT `admin_activity_log`
+-- AUTO_INCREMENT for table `admin_activity_log`
 --
 ALTER TABLE `admin_activity_log`
   MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 使用表AUTO_INCREMENT `admin_users`
+-- AUTO_INCREMENT for table `admin_users`
 --
 ALTER TABLE `admin_users`
   MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- 使用表AUTO_INCREMENT `categories`
+-- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
   MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
--- 使用表AUTO_INCREMENT `diary_entries`
+-- AUTO_INCREMENT for table `diary_entries`
 --
 ALTER TABLE `diary_entries`
   MODIFY `entry_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- 使用表AUTO_INCREMENT `error_logs`
+-- AUTO_INCREMENT for table `error_logs`
 --
 ALTER TABLE `error_logs`
   MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- 使用表AUTO_INCREMENT `exercises`
+-- AUTO_INCREMENT for table `exercises`
 --
 ALTER TABLE `exercises`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
--- 使用表AUTO_INCREMENT `exercise_tracker`
+-- AUTO_INCREMENT for table `exercise_tracker`
 --
 ALTER TABLE `exercise_tracker`
   MODIFY `exercise_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- 使用表AUTO_INCREMENT `money_categories`
+-- AUTO_INCREMENT for table `habits`
+--
+ALTER TABLE `habits`
+  MODIFY `habit_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `habit_logs`
+--
+ALTER TABLE `habit_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `money_categories`
 --
 ALTER TABLE `money_categories`
   MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
--- 使用表AUTO_INCREMENT `money_transactions`
+-- AUTO_INCREMENT for table `money_transactions`
 --
 ALTER TABLE `money_transactions`
   MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
--- 使用表AUTO_INCREMENT `password_reset_tokens`
+-- AUTO_INCREMENT for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   MODIFY `token_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 使用表AUTO_INCREMENT `system_settings`
+-- AUTO_INCREMENT for table `system_settings`
 --
 ALTER TABLE `system_settings`
   MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 使用表AUTO_INCREMENT `transactions`
+-- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
   MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 使用表AUTO_INCREMENT `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- 使用表AUTO_INCREMENT `user_remember_tokens`
+-- AUTO_INCREMENT for table `user_remember_tokens`
 --
 ALTER TABLE `user_remember_tokens`
   MODIFY `token_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- 限制导出的表
+-- Constraints for dumped tables
 --
 
 --
--- 限制表 `admin_activity_log`
+-- Constraints for table `admin_activity_log`
 --
 ALTER TABLE `admin_activity_log`
   ADD CONSTRAINT `admin_activity_log_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin_users` (`admin_id`) ON DELETE CASCADE;
 
 --
--- 限制表 `admin_sessions`
+-- Constraints for table `admin_sessions`
 --
 ALTER TABLE `admin_sessions`
   ADD CONSTRAINT `admin_sessions_ibfk_1` FOREIGN KEY (`admin_id`) REFERENCES `admin_users` (`admin_id`) ON DELETE CASCADE;
 
 --
--- 限制表 `diary_entries`
+-- Constraints for table `diary_entries`
 --
 ALTER TABLE `diary_entries`
   ADD CONSTRAINT `diary_entries_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- 限制表 `error_logs`
+-- Constraints for table `error_logs`
 --
 ALTER TABLE `error_logs`
   ADD CONSTRAINT `error_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE SET NULL;
 
 --
--- 限制表 `exercise_tracker`
+-- Constraints for table `exercise_tracker`
 --
 ALTER TABLE `exercise_tracker`
   ADD CONSTRAINT `exercise_tracker_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_exercise_ref` FOREIGN KEY (`exercise_ref_id`) REFERENCES `exercises` (`id`);
 
 --
--- 限制表 `money_transactions`
+-- Constraints for table `habits`
+--
+ALTER TABLE `habits`
+  ADD CONSTRAINT `habits_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `habit_logs`
+--
+ALTER TABLE `habit_logs`
+  ADD CONSTRAINT `habit_logs_ibfk_1` FOREIGN KEY (`habit_id`) REFERENCES `habits` (`habit_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `money_transactions`
 --
 ALTER TABLE `money_transactions`
   ADD CONSTRAINT `money_transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- 限制表 `password_reset_tokens`
+-- Constraints for table `password_reset_tokens`
 --
 ALTER TABLE `password_reset_tokens`
   ADD CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- 限制表 `system_settings`
+-- Constraints for table `system_settings`
 --
 ALTER TABLE `system_settings`
   ADD CONSTRAINT `system_settings_ibfk_1` FOREIGN KEY (`updated_by`) REFERENCES `admin_users` (`admin_id`) ON DELETE SET NULL;
 
 --
--- 限制表 `transactions`
+-- Constraints for table `transactions`
 --
 ALTER TABLE `transactions`
   ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`);
 
 --
--- 限制表 `user_remember_tokens`
+-- Constraints for table `user_remember_tokens`
 --
 ALTER TABLE `user_remember_tokens`
   ADD CONSTRAINT `user_remember_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
