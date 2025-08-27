@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 26, 2025 at 04:34 PM
+-- Generation Time: Aug 27, 2025 at 07:39 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,7 +80,7 @@ CREATE TABLE `admin_users` (
 
 INSERT INTO `admin_users` (`admin_id`, `username`, `email`, `password`, `role`, `is_active`, `created_at`, `last_login`, `login_attempts`, `locked_until`) VALUES
 (1, 'admin', 'admin@studentorganizer.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'super_admin', 1, '2025-08-24 04:45:55', NULL, 2, NULL),
-(3, 'CheeseStar', 'wilsontan0427@1utar.my', '$2y$10$BDKq0xWsisxe87Eym/CJTu7pqA51wRzC7tJD7yZtxAuXnWOBWNhAi', 'super_admin', 1, '2025-08-24 21:30:03', '2025-08-25 00:41:06', 0, NULL);
+(3, 'CheeseStar', 'wilsontan0427@1utar.my', '$2y$10$BDKq0xWsisxe87Eym/CJTu7pqA51wRzC7tJD7yZtxAuXnWOBWNhAi', 'super_admin', 1, '2025-08-24 21:30:03', '2025-08-27 05:34:34', 0, NULL);
 
 -- --------------------------------------------------------
 
@@ -438,7 +438,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`) VALUES
 (1, 'jhteoh20', 'jhteoh20@1utar.my', '$2y$10$7ugJCsVKS2Tf6YAqKzzTxOzsLhnzFpsr2bVzA9PmWVFnu6OtiBDRu', '2025-08-25 16:18:31'),
-(2, 'unknown', 'xueenng2023@1utar.my', '$2y$10$vR5ZLz96laDToaDVbjQinOZQue0fj5XlyzWZXdqHwIq8jieJ2Yv92', '2025-08-26 13:30:47');
+(2, 'unknown', 'xueenng2023@1utar.my', '$2y$10$vR5ZLz96laDToaDVbjQinOZQue0fj5XlyzWZXdqHwIq8jieJ2Yv92', '2025-08-26 13:30:47'),
+(3, 'jooyee', 'cjyee03@1utar.my', '$2y$10$HrhFzr89Z3.8xScIY2i4o.cSXxVjxj/NG.4Ea7vu3YPtCvWOKqBlK', '2025-08-27 05:33:39'),
+(4, 'CheeseStar', 'wilsontan0427@1utar.my', '$2y$10$6g2AHU9iCINat5egpbRRJe5RBlerIVSLeTs9crakCTcAoL0ATpwoC', '2025-08-27 05:34:12');
 
 -- --------------------------------------------------------
 
@@ -692,7 +694,7 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `user_remember_tokens`
