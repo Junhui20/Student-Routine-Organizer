@@ -130,30 +130,24 @@ include '../includes/header.php';
     /* ✅ Uniform Action Buttons */
     .action-buttons {
         display: flex;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
+        gap: 15px;
+        /* space between buttons */
     }
 
-    .action-buttons form,
-    .action-buttons a {
-        flex: 1;
-    }
-
-    .action-btn {
+    .action-buttons .btn {
+        min-width: 200px;
+        /* same width */
+        min-height: 45px;
+        /* same height */
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        height: 60px;
-        /* all same height */
-        font-weight: 500;
-        text-align: center;
-        border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 14px;
     }
 
-    .action-btn i {
+    .action-buttons i {
         margin-right: 6px;
+        /* spacing between icon and text */
     }
 </style>
 
@@ -227,26 +221,39 @@ include '../includes/header.php';
 
         <!-- Actions -->
         <div class="action-buttons">
-            <form method="post" action="toggle_today.php">
-                <input type="hidden" name="habit_id" value="<?= $habit_id ?>">
-                <input type="hidden" name="action" value="<?= $done_today ? 'unmark' : 'mark' ?>">
-                <input type="hidden" name="status" value="done">
-                <button class="action-btn btn <?= $done_today ? 'btn-secondary' : 'btn-success' ?>">
-                    <i class="bi <?= $done_today ? 'bi-x-circle' : 'bi-check-circle' ?>"></i>
-                    <?= $done_today ? 'Unmark' : 'Mark Done' ?>
+            <?php if ((int) $habit['is_active'] === 0): ?>
+                <!-- Inactive habit: show disabled button -->
+                <button class="action-btn btn btn-secondary">
+                    <i class="fa fa-ban"></i> Inactive
                 </button>
-            </form>
+            <?php else: ?>
+                <!-- Active habits -->
+                <form method="post" action="toggle_today.php">
+                    <input type="hidden" name="habit_id" value="<?= $habit_id ?>">
+                    <input type="hidden" name="action" value="<?= $done_today ? 'unmark' : 'mark' ?>">
+                    <input type="hidden" name="status" value="done">
+                    <button class="action-btn btn <?= $done_today ? 'btn-secondary' : 'btn-success' ?>">
+                        <i class="fa <?= $done_today ? 'fa fa-undo' : 'fas fa-check' ?>"></i>
+                        <?= $done_today ? 'Unmark' : 'Mark Done' ?>
+                    </button>
+                </form>
+            <?php endif; ?>
+
             <a href="edit_habit.php?id=<?= $habit_id ?>" class="action-btn btn btn-warning">
-                <i class="bi bi-pencil-square"></i> Edit
+                <i class="fa fa-pencil-alt"></i> Edit
             </a>
+
             <form method="post" action="delete_habit.php"
                 onsubmit="return confirm('Delete this habit? This removes logs too.')">
                 <input type="hidden" name="id" value="<?= $habit_id ?>">
                 <button class="action-btn btn btn-danger">
-                    <i class="bi bi-trash"></i> Delete
+                    <i class="fa fa-trash"></i> Delete
                 </button>
             </form>
         </div>
+
+
+
 
     </div>
 </div>
