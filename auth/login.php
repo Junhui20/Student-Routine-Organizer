@@ -160,7 +160,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <p>Don't have an account? <a href="register.php">Register here</a></p>
                 <p><a href="forgot_password.php">Forgot your password?</a></p>
             </div>
-            
+            <div class="text-center mt-2">
+                <p>I am an admin <a href="../admin/login.php">Login here</a></p>
+            </div>
             <div class="text-center mt-2">
                 <small class="text-muted">
                     Access to: Exercise Tracker | Diary Journal | Money Tracker | Habit Tracker
