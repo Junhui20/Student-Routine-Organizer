@@ -29,3 +29,36 @@ IP: ::1
 URL: /student-routine-organizer/habits/add_habit.php
 IP: ::1
 
+[2025-08-27 01:23:27] EXCEPTION: Call to private ErrorHandler::__construct() from global scope in forgot_password.php:14
+Stack trace:
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-27 01:29:55] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 01:31:08] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 01:31:23] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 01:32:10] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 01:32:27] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 01:32:38] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
+[2025-08-27 02:16:46] MONEY_TRACKER: Money Tracker add error: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '0' for key 'PRIMARY' in :0
+URL: /Student-Routine-Organizer/money/add_transaction.php
+IP: ::1
+
