@@ -438,10 +438,6 @@ try {
                                 </h3>
                                 <div class="entry-meta">
                                     <span><i class="fas fa-calendar"></i> <?php echo date('M j, Y', strtotime($exercise['exercise_date'])); ?></span>
-                                    <span><i class="fas fa-stopwatch"></i> <?php echo $exercise['duration_minutes']; ?> minutes</span>
-                                    <?php if($exercise['calories_burned']): ?>
-                                        <span><i class="fas fa-fire"></i> <?php echo $exercise['calories_burned']; ?> calories</span>
-                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="entry-actions">

@@ -1,4 +1,7 @@
 <?php
+// Set Malaysia timezone FIRST, before any other operations
+date_default_timezone_set('Asia/Kuala_Lumpur');
+
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -62,16 +65,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "Duration must be greater than 0 minutes.";
     }
     
-    if (empty($exercise_date)) {
-        $errors[] = "Exercise date is required.";
-    } elseif (strtotime($exercise_date) > time()) {
-        $errors[] = "Exercise date cannot be in the future.";
-    }
-    
-    if (empty($exercise_time)) {
-        $errors[] = "Exercise time is required.";
-    }
-    
     if ($calories_burned <= 0) {
         $errors[] = "Calories burned must be greater than 0.";
     }
@@ -81,16 +74,49 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "Weight must be between 1 and 500 kg.";
     }
     
-    // Set Malaysia timezone for validation
-    date_default_timezone_set('Asia/Kuala_Lumpur');
+    // IMPROVED DATE AND TIME VALIDATION
+    if (empty($exercise_date)) {
+        $errors[] = "Exercise date is required.";
+    } else {
+        // Validate date format first
+        $date_check = DateTime::createFromFormat('Y-m-d', $exercise_date);
+        if (!$date_check || $date_check->format('Y-m-d') !== $exercise_date) {
+            $errors[] = "Invalid date format.";
+        } else {
+            // Check if date is in the future (date only)
+            $exercise_date_obj = new DateTime($exercise_date);
+            $today = new DateTime('today'); // Today at 00:00:00 in Malaysia timezone
+            
+            if ($exercise_date_obj > $today) {
+                $errors[] = "Exercise date cannot be in the future.";
+            }
+        }
+    }
     
-    // Combine date and time for timestamp validation
-    $exercise_datetime = $exercise_date . ' ' . $exercise_time;
-    $selected_timestamp = strtotime($exercise_datetime);
-    $current_timestamp = time();
+    if (empty($exercise_time)) {
+        $errors[] = "Exercise time is required.";
+    } else {
+        // Validate time format
+        if (!preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/', $exercise_time)) {
+            $errors[] = "Invalid time format.";
+        }
+    }
     
-    if ($selected_timestamp > $current_timestamp) {
-        $errors[] = "Exercise date and time cannot be in the future (Malaysia time).";
+    // Only validate date+time combination if both are valid individually
+    if (!empty($exercise_date) && !empty($exercise_time)) {
+        try {
+            // Create datetime object for the selected date and time
+            $exercise_datetime = new DateTime($exercise_date . ' ' . $exercise_time);
+            $current_datetime = new DateTime(); // Current Malaysia time
+            
+            // Only check if it's in the future with a small buffer to account for processing time
+            if ($exercise_datetime > $current_datetime->add(new DateInterval('PT1M'))) {
+                $current_display = $current_datetime->sub(new DateInterval('PT1M'))->format('Y-m-d H:i');
+                $errors[] = "Exercise date and time cannot be in the future (Current Malaysia time: " . $current_display . ").";
+            }
+        } catch (Exception $e) {
+            $errors[] = "Invalid date and time combination.";
+        }
     }
     
     // If no errors, save to database
@@ -155,9 +181,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 }
-
-// Set Malaysia timezone for all date operations
-date_default_timezone_set('Asia/Kuala_Lumpur');
 
 // Set default date and time (Malaysia time)
 $default_date = date('Y-m-d');
@@ -242,13 +265,11 @@ $category_icons = [
             align-items: end;
         }
         .weight-duration-grid .form-group {
-    display: flex;
-    flex-direction: column;
-    height: 75%;
-}
+            display: flex;
+            flex-direction: column;
+            height: 75%;
+        }
 
-
-        
         @media (max-width: 768px) {
             .time-date-grid, .duration-calories-grid, .weight-duration-grid {
                 grid-template-columns: 1fr;
@@ -296,9 +317,9 @@ $category_icons = [
             margin-right: 0.5rem;
         }
        
-.weight-input-section label[for="user_weight"] {
-    margin-bottom: 1.5rem; 
-}
+        .weight-input-section label[for="user_weight"] {
+            margin-bottom: 1.5rem; 
+        }
         
         .calculation-details {
             font-size: 0.85rem;
@@ -414,6 +435,23 @@ $category_icons = [
 
         .duration-input {
             flex: 1;
+        }
+
+        .timezone-info {
+            background: #e7f3ff;
+            border: 1px solid #b8daff;
+            color: #004085;
+            padding: 0.75rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .timezone-info i {
+            margin-right: 0.5rem;
+            color: #0056b3;
         }
     </style>
 </head>
@@ -551,6 +589,10 @@ $category_icons = [
                                max="<?php echo date('Y-m-d'); ?>"
                                required>
                         <small class="text-muted">When did you do this exercise?</small>
+                        <div class="timezone-info">
+                            <i class="fas fa-clock"></i>
+                            All times are in Malaysia timezone (GMT+8)
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -768,41 +810,77 @@ $category_icons = [
             updateCaloriesCalculation();
         });
         
+        // IMPROVED DATE AND TIME VALIDATION
+        function validateDateTime() {
+            const dateInput = document.getElementById('exercise_date');
+            const timeInput = document.getElementById('exercise_time');
+            
+            if (!dateInput.value || !timeInput.value) {
+                return; // Don't validate if either field is empty
+            }
+            
+            try {
+                // Create date object from input values (assumes local timezone)
+                const selectedDateTime = new Date(dateInput.value + 'T' + timeInput.value);
+                
+                // Get current time and convert to Malaysia timezone
+                const now = new Date();
+                const malaysiaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kuala_Lumpur"}));
+                
+                // Add a small buffer (1 minute) to account for processing time
+                const bufferTime = new Date(malaysiaTime.getTime() + 60000);
+                
+                // Check if the selected datetime is in the future
+                if (selectedDateTime > bufferTime) {
+                    // More user-friendly error message
+                    const currentMalaysiaStr = malaysiaTime.toLocaleString('en-MY', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    
+                    alert(`Exercise date and time cannot be in the future.\nCurrent Malaysia time: ${currentMalaysiaStr}`);
+                    
+                    // Auto-correct to current time if it's today's date
+                    const today = malaysiaTime.toISOString().split('T')[0];
+                    if (dateInput.value === today) {
+                        const currentHour = malaysiaTime.getHours().toString().padStart(2, '0');
+                        const currentMin = malaysiaTime.getMinutes().toString().padStart(2, '0');
+                        timeInput.value = currentHour + ':' + currentMin;
+                    } else {
+                        // If it's a future date, reset to today
+                        dateInput.value = today;
+                        const currentHour = malaysiaTime.getHours().toString().padStart(2, '0');
+                        const currentMin = malaysiaTime.getMinutes().toString().padStart(2, '0');
+                        timeInput.value = currentHour + ':' + currentMin;
+                    }
+                }
+            } catch (error) {
+                console.error('Date validation error:', error);
+            }
+        }
+        
+        // Add debounced validation to prevent excessive alerts
+        let validationTimeout;
+        function debouncedValidation() {
+            clearTimeout(validationTimeout);
+            validationTimeout = setTimeout(validateDateTime, 500); // Wait 500ms after user stops typing
+        }
+        
         // Event listeners
         document.getElementById('exercise_type').addEventListener('change', updateCaloriesCalculation);
         document.getElementById('duration_minutes').addEventListener('input', updateCaloriesCalculation);
         document.getElementById('user_weight').addEventListener('input', updateCaloriesCalculation);
         document.getElementById('auto-calculate-btn').addEventListener('click', autoCalculateCalories);
         
-        // Validate date and time combination (Malaysia timezone)
-        function validateDateTime() {
-            const dateInput = document.getElementById('exercise_date');
-            const timeInput = document.getElementById('exercise_time');
-            
-            if (dateInput.value && timeInput.value) {
-                const selectedDateTime = new Date(dateInput.value + 'T' + timeInput.value);
-                
-                // Get current Malaysia time (UTC+8)
-                const now = new Date();
-                const malaysiaOffset = 8 * 60; // 8 hours in minutes
-                const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-                const malaysiaTime = new Date(utc + (malaysiaOffset * 60000));
-                
-                if (selectedDateTime > malaysiaTime) {
-                    alert('Exercise date and time cannot be in the future (Malaysia time)!');
-                    // Reset to current Malaysia time if it's today
-                    const todayMalaysia = malaysiaTime.toISOString().split('T')[0];
-                    if (dateInput.value === todayMalaysia) {
-                        const currentHour = malaysiaTime.getHours().toString().padStart(2, '0');
-                        const currentMin = malaysiaTime.getMinutes().toString().padStart(2, '0');
-                        timeInput.value = currentHour + ':' + currentMin;
-                    }
-                }
-            }
-        }
-        
+        // Date/time validation
         document.getElementById('exercise_date').addEventListener('change', validateDateTime);
         document.getElementById('exercise_time').addEventListener('change', validateDateTime);
+        document.getElementById('exercise_date').addEventListener('input', debouncedValidation);
+        document.getElementById('exercise_time').addEventListener('input', debouncedValidation);
         
         // Initialize on page load
         window.addEventListener('load', function() {
@@ -822,6 +900,11 @@ $category_icons = [
                     updateCaloriesCalculation();
                 }, 100);
             }
+            
+            // Show current Malaysia time in console for debugging
+            const now = new Date();
+            const malaysiaTime = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Kuala_Lumpur"}));
+            console.log('Current Malaysia time:', malaysiaTime.toLocaleString());
         });
     </script>
 </body>

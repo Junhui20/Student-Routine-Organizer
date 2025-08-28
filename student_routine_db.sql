@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 27, 2025 at 07:39 AM
+-- Generation Time: Aug 28, 2025 at 06:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -85,38 +85,6 @@ INSERT INTO `admin_users` (`admin_id`, `username`, `email`, `password`, `role`, 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `categories`
---
-
-CREATE TABLE `categories` (
-  `category_id` int(11) NOT NULL,
-  `category_name` varchar(50) NOT NULL,
-  `category_type` enum('income','expense') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `categories`
---
-
-INSERT INTO `categories` (`category_id`, `category_name`, `category_type`, `created_at`) VALUES
-(1, 'Allowance', 'income', '2025-07-20 08:27:09'),
-(2, 'Part-time Job', 'income', '2025-07-20 08:27:09'),
-(3, 'Scholarship', 'income', '2025-07-20 08:27:09'),
-(4, 'Gift Money', 'income', '2025-07-20 08:27:09'),
-(5, 'Other Income', 'income', '2025-07-20 08:27:09'),
-(6, 'Food', 'expense', '2025-07-20 08:27:09'),
-(7, 'Transportation', 'expense', '2025-07-20 08:27:09'),
-(8, 'Books & Supplies', 'expense', '2025-07-20 08:27:09'),
-(9, 'Entertainment', 'expense', '2025-07-20 08:27:09'),
-(10, 'Bills', 'expense', '2025-07-20 08:27:09'),
-(11, 'Clothing', 'expense', '2025-07-20 08:27:09'),
-(12, 'Health', 'expense', '2025-07-20 08:27:09'),
-(13, 'Other Expenses', 'expense', '2025-07-20 08:27:09');
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `diary_entries`
 --
 
@@ -159,6 +127,14 @@ CREATE TABLE `error_logs` (
   `ip_address` varchar(45) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `error_logs`
+--
+
+INSERT INTO `error_logs` (`log_id`, `user_id`, `error_type`, `error_message`, `error_file`, `error_line`, `stack_trace`, `request_uri`, `user_agent`, `ip_address`, `created_at`) VALUES
+(3, 3, 'PHP_ERROR:E_WARNING', 'Undefined variable $conn', 'C:\\xampp\\htdocs\\Student-Routine-Organizer\\money\\edit_transaction.php', 87, '[{\"file\":\"C:\\\\xampp\\\\htdocs\\\\Student-Routine-Organizer\\\\money\\\\edit_transaction.php\",\"line\":87,\"function\":\"handleError\",\"class\":\"ErrorHandler\",\"type\":\"->\"}]', '/Student-Routine-Organizer/money/edit_transaction.php?id=8', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', '::1', '2025-08-28 16:37:18'),
+(4, 3, 'EXCEPTION:Error', 'Call to a member function prepare() on null', 'C:\\xampp\\htdocs\\Student-Routine-Organizer\\money\\edit_transaction.php', 87, '[]', '/Student-Routine-Organizer/money/edit_transaction.php?id=8', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', '::1', '2025-08-28 16:37:18');
 
 -- --------------------------------------------------------
 
@@ -222,7 +198,7 @@ CREATE TABLE `exercise_tracker` (
   `exercise_ref_id` int(11) DEFAULT NULL,
   `exercise_type` varchar(100) NOT NULL,
   `duration_minutes` int(11) NOT NULL,
-  `calories_burned` int(11) DEFAULT NULL,
+  `calories_burned` int(11) NOT NULL,
   `exercise_date` date NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -240,7 +216,8 @@ INSERT INTO `exercise_tracker` (`exercise_id`, `user_id`, `exercise_ref_id`, `ex
 (4, 1, 2, 'Running, 5 mph (12 min/mile)', 24, 250, '2025-08-10', '2025-08-25 16:42:23', '2025-08-25 16:42:23', '18:10:00', ''),
 (5, 1, 5, 'Bicycling', 50, 429, '2025-08-13', '2025-08-25 16:43:01', '2025-08-25 16:43:01', '17:14:00', ''),
 (6, 1, 16, 'Rope skipping (jump rope)', 40, 539, '2025-08-16', '2025-08-25 16:43:54', '2025-08-25 16:43:54', '09:05:00', ''),
-(7, 1, 2, 'Running, 5 mph (12 min/mile)', 36, 375, '2025-08-22', '2025-08-25 16:44:48', '2025-08-25 16:44:48', '08:38:00', '');
+(7, 1, 2, 'Running, 5 mph (12 min/mile)', 36, 375, '2025-08-22', '2025-08-25 16:44:48', '2025-08-25 16:44:48', '08:38:00', ''),
+(8, 3, 5, 'Bicycling', 221, 189, '2025-08-29', '2025-08-28 16:36:33', '2025-08-28 16:36:44', '00:36:00', '');
 
 -- --------------------------------------------------------
 
@@ -362,7 +339,8 @@ INSERT INTO `money_transactions` (`transaction_id`, `user_id`, `type`, `amount`,
 (4, 1, 'expense', 100.00, 'Education', 'Fee', '2025-08-05', '2025-08-25 16:31:41', '2025-08-25 16:31:41'),
 (5, 1, 'income', 120.00, 'Part-time Job', 'Promoter', '2025-08-08', '2025-08-25 16:32:32', '2025-08-25 16:32:32'),
 (6, 1, 'expense', 30.00, 'Bills & Utilities', 'Mobile Fee', '2025-08-05', '2025-08-25 16:34:09', '2025-08-25 16:34:09'),
-(7, 1, 'expense', 300.00, 'Rent', 'Unit', '2025-08-04', '2025-08-25 16:35:10', '2025-08-25 16:35:10');
+(7, 1, 'expense', 300.00, 'Rent', 'Unit', '2025-08-04', '2025-08-25 16:35:10', '2025-08-25 16:35:10'),
+(8, 3, 'income', 20.00, 'Part-time Job', '', '2025-08-28', '2025-08-28 16:37:01', '2025-08-28 16:37:01');
 
 -- --------------------------------------------------------
 
@@ -398,24 +376,6 @@ CREATE TABLE `system_settings` (
   `is_public` tinyint(1) DEFAULT 0,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updated_by` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `transactions`
---
-
-CREATE TABLE `transactions` (
-  `transaction_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `amount` decimal(10,2) NOT NULL,
-  `category_id` int(11) NOT NULL,
-  `transaction_type` enum('income','expense') NOT NULL,
-  `description` text DEFAULT NULL,
-  `transaction_date` date NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -489,12 +449,6 @@ ALTER TABLE `admin_users`
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `idx_role` (`role`),
   ADD KEY `idx_active` (`is_active`);
-
---
--- Indexes for table `categories`
---
-ALTER TABLE `categories`
-  ADD PRIMARY KEY (`category_id`);
 
 --
 -- Indexes for table `diary_entries`
@@ -578,14 +532,6 @@ ALTER TABLE `system_settings`
   ADD KEY `system_settings_ibfk_1` (`updated_by`);
 
 --
--- Indexes for table `transactions`
---
-ALTER TABLE `transactions`
-  ADD PRIMARY KEY (`transaction_id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `category_id` (`category_id`);
-
---
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -619,12 +565,6 @@ ALTER TABLE `admin_users`
   MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `categories`
---
-ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
-
---
 -- AUTO_INCREMENT for table `diary_entries`
 --
 ALTER TABLE `diary_entries`
@@ -634,7 +574,7 @@ ALTER TABLE `diary_entries`
 -- AUTO_INCREMENT for table `error_logs`
 --
 ALTER TABLE `error_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `exercises`
@@ -646,7 +586,7 @@ ALTER TABLE `exercises`
 -- AUTO_INCREMENT for table `exercise_tracker`
 --
 ALTER TABLE `exercise_tracker`
-  MODIFY `exercise_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `exercise_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `habits`
@@ -670,7 +610,7 @@ ALTER TABLE `money_categories`
 -- AUTO_INCREMENT for table `money_transactions`
 --
 ALTER TABLE `money_transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `password_reset_tokens`
@@ -683,12 +623,6 @@ ALTER TABLE `password_reset_tokens`
 --
 ALTER TABLE `system_settings`
   MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `transactions`
---
-ALTER TABLE `transactions`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -766,13 +700,6 @@ ALTER TABLE `password_reset_tokens`
 --
 ALTER TABLE `system_settings`
   ADD CONSTRAINT `system_settings_ibfk_1` FOREIGN KEY (`updated_by`) REFERENCES `admin_users` (`admin_id`) ON DELETE SET NULL;
-
---
--- Constraints for table `transactions`
---
-ALTER TABLE `transactions`
-  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`);
 
 --
 -- Constraints for table `user_remember_tokens`
