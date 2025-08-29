@@ -11,7 +11,7 @@ if (session_status() == PHP_SESSION_NONE) {
 
 $sessionManager = new SessionManager($pdo);
 $passwordResetHandler = new PasswordResetHandler($pdo);
-$errorHandler = new ErrorHandler($pdo);
+$errorHandler = ErrorHandler::getInstance();
 
 // If user is already logged in, redirect to dashboard
 if (isset($_SESSION['user_id']) && $sessionManager->validateSession()) {
