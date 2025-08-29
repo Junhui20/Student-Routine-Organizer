@@ -17,9 +17,6 @@ require_once '../config/database.php';
 $errors = [];
 $success = false;
 
-// Set default weight 
-$user_weight = 70; 
-
 try {
     $db = new Database();
     $conn = $db->getConnection();
@@ -42,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $calories_burned = (int)$_POST['calories_burned'];
     $exercise_date = $_POST['exercise_date'];
     $exercise_time = $_POST['exercise_time'];
-    $user_input_weight = isset($_POST['user_weight']) ? (float)$_POST['user_weight'] : $user_weight;
+    $user_input_weight = isset($_POST['user_weight']) ? (float)$_POST['user_weight'] : null;
     $notes = trim($_POST['notes']); // Add notes field
     
     // Validation
@@ -69,9 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $errors[] = "Calories burned must be greater than 0.";
     }
     
-    // Validate weight input
-    if ($user_input_weight <= 0 || $user_input_weight > 500) {
-        $errors[] = "Weight must be between 1 and 500 kg.";
+    // Validate weight input (only if provided)
+    if ($user_input_weight !== null) {
+        if ($user_input_weight < 30 || $user_input_weight > 500) {
+            $errors[] = "Weight must be between 30 and 500 kg.";
+        }
     }
     
     // IMPROVED DATE AND TIME VALIDATION
@@ -304,6 +303,12 @@ $category_icons = [
             display: block;
         }
         
+        .auto-calc-indicator.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
         .weight-info {
             background: #fff3cd;
             border-left: 4px solid #ffc107;
@@ -453,6 +458,35 @@ $category_icons = [
             margin-right: 0.5rem;
             color: #0056b3;
         }
+
+        /* Updated validation styles */
+        .form-field-invalid {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .validation-message {
+            font-size: 0.85rem;
+            color: #dc3545;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .validation-message.show {
+            display: block;
+        }
+
+        /* Specific styling for duration validation */
+        .duration-validation-message {
+            font-size: 0.85rem;
+            color: #dc3545;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .duration-validation-message.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -544,13 +578,14 @@ $category_icons = [
                             <input type="number" 
                                    id="user_weight" 
                                    name="user_weight" 
-                                   value="<?php echo isset($_POST['user_weight']) ? htmlspecialchars($_POST['user_weight']) : $user_weight; ?>"
+                                   value="<?php echo isset($_POST['user_weight']) ? htmlspecialchars($_POST['user_weight']) : ''; ?>"
                                    min="30" 
                                    max="500"
                                    step="0.1"
                                    placeholder="e.g., 70.5"
                                    required>
                             <small class="text-muted">Enter your current weight (30-500 kg)</small>
+                            <div id="weight-validation-message" class="validation-message"></div>
                         </div>
 
                         <div class="form-group">
@@ -573,6 +608,7 @@ $category_icons = [
                                 </button>
                             </div>
                             <small class="text-muted">How long did you exercise? (1-600 minutes)</small>
+                            <div id="duration-validation-message" class="duration-validation-message"></div>
                         </div>
                     </div>
                 </div>
@@ -678,7 +714,6 @@ $category_icons = [
         // Exercise data for JavaScript
         const exerciseData = <?php echo json_encode($exercise_options); ?>;
         const groupedExercises = <?php echo json_encode($grouped_exercises); ?>;
-        const defaultWeight = <?php echo $user_weight; ?>;
         
         // Create exercise lookup by ID for quick access
         const exerciseLookup = {};
@@ -692,41 +727,111 @@ $category_icons = [
             return Math.round(durationMinutes * (metValue * 3.5 * weightKg) / 200);
         }
         
-        // Update calories when exercise, duration, or weight changes
+        // Show validation message for form fields
+        function showValidationMessage(fieldId, messageId, message) {
+            const field = document.getElementById(fieldId);
+            const messageElement = document.getElementById(messageId);
+            
+            field.classList.add('form-field-invalid');
+            messageElement.textContent = message;
+            messageElement.classList.add('show');
+        }
+        
+        // Hide validation message for form fields
+        function hideValidationMessage(fieldId, messageId) {
+            const field = document.getElementById(fieldId);
+            const messageElement = document.getElementById(messageId);
+            
+            field.classList.remove('form-field-invalid');
+            messageElement.classList.remove('show');
+        }
+        
+        // Validate weight input with form-style validation
+        function validateWeightInput() {
+            const weightInput = document.getElementById('user_weight');
+            const weight = parseFloat(weightInput.value) || 0;
+            
+            if (!weightInput.value) {
+                hideValidationMessage('user_weight', 'weight-validation-message');
+                return false;
+            }
+            
+            if (weight < 30 || weight > 500) {
+                let message = '';
+                if (weight < 30) {
+                    message = 'Weight must be at least 30 kg';
+                } else if (weight > 500) {
+                    message = 'Weight must be 500 kg or less';
+                }
+                showValidationMessage('user_weight', 'weight-validation-message', message);
+                return false;
+            }
+            
+            hideValidationMessage('user_weight', 'weight-validation-message');
+            return true;
+        }
+        
+        // Validate duration input with form-style validation
+        function validateDurationInput() {
+            const durationInput = document.getElementById('duration_minutes');
+            const duration = parseInt(durationInput.value) || 0;
+            
+            if (!durationInput.value) {
+                hideValidationMessage('duration_minutes', 'duration-validation-message');
+                return false;
+            }
+            
+            if (duration < 1 || duration > 600) {
+                let message = '';
+                if (duration < 1) {
+                    message = 'Duration must be at least 1 minute';
+                } else if (duration > 600) {
+                    message = 'Duration must be 600 minutes or less';
+                }
+                showValidationMessage('duration_minutes', 'duration-validation-message', message);
+                return false;
+            }
+            
+            hideValidationMessage('duration_minutes', 'duration-validation-message');
+            return true;
+        }
+        
+        // Update calories calculation state
         function updateCaloriesCalculation() {
             const exerciseSelect = document.getElementById('exercise_type');
             const durationInput = document.getElementById('duration_minutes');
             const weightInput = document.getElementById('user_weight');
-            const caloriesInput = document.getElementById('calories_burned');
             const metInfo = document.getElementById('met-info');
             const metDetails = document.getElementById('met-details');
-            const calcDetails = document.getElementById('calc-details');
-            const calcFormula = document.getElementById('calc-formula');
             const autoCalcBtn = document.getElementById('auto-calculate-btn');
             
             const selectedExerciseId = exerciseSelect.value;
             const duration = parseInt(durationInput.value) || 0;
-            const weight = parseFloat(weightInput.value) || defaultWeight;
+            const weight = parseFloat(weightInput.value) || 0;
+            
+            // Validate inputs
+            const isValidWeight = weight >= 30 && weight <= 500;
+            const isValidDuration = duration >= 1 && duration <= 600;
+            const hasValidExercise = selectedExerciseId && exerciseLookup[selectedExerciseId];
             
             // Enable/disable auto calculate button
-            if (selectedExerciseId && duration > 0 && weight > 0 && exerciseLookup[selectedExerciseId]) {
+            if (hasValidExercise && isValidDuration && isValidWeight) {
                 autoCalcBtn.disabled = false;
                 
                 const exercise = exerciseLookup[selectedExerciseId];
                 const metValue = parseFloat(exercise.met_value);
                 
-                // Show MET information
                 metDetails.innerHTML = `MET Value: ${metValue} - Ready for auto calculation with ${weight} kg`;
                 metInfo.classList.add('show');
+                metInfo.classList.remove('error');
                 
             } else {
                 autoCalcBtn.disabled = true;
                 metInfo.classList.remove('show');
-                calcDetails.classList.remove('show');
             }
         }
         
-        // Auto calculate calories
+        // Auto calculate calories with form-style validation
         function autoCalculateCalories() {
             const exerciseSelect = document.getElementById('exercise_type');
             const durationInput = document.getElementById('duration_minutes');
@@ -735,28 +840,78 @@ $category_icons = [
             const calcDetails = document.getElementById('calc-details');
             const calcFormula = document.getElementById('calc-formula');
             
+            // Clear any existing validation messages
+            hideValidationMessage('user_weight', 'weight-validation-message');
+            hideValidationMessage('duration_minutes', 'duration-validation-message');
+            
             const selectedExerciseId = exerciseSelect.value;
             const duration = parseInt(durationInput.value) || 0;
-            const weight = parseFloat(weightInput.value) || defaultWeight;
+            const weight = parseFloat(weightInput.value) || 0;
             
-            if (selectedExerciseId && duration > 0 && weight > 0 && exerciseLookup[selectedExerciseId]) {
-                const exercise = exerciseLookup[selectedExerciseId];
-                const metValue = parseFloat(exercise.met_value);
-                const calculatedCalories = calculateCalories(metValue, duration, weight);
-                
-                // Update calories input with animation
-                caloriesInput.style.background = '#d4edda';
-                caloriesInput.value = calculatedCalories;
-                
-                // Show calculation details
-                calcFormula.innerHTML = `${duration} min × (${metValue} × 3.5 × ${weight} kg) ÷ 200 = ${calculatedCalories} calories`;
-                calcDetails.classList.add('show');
-                
-                // Reset background after animation
-                setTimeout(() => {
-                    caloriesInput.style.background = '';
-                }, 1000);
+            let hasErrors = false;
+            
+            // Validate exercise selection
+            if (!selectedExerciseId || !exerciseLookup[selectedExerciseId]) {
+                alert('Please select an exercise first.');
+                return;
             }
+            
+            // Validate weight with form-style validation
+            if (!weightInput.value) {
+                showValidationMessage('user_weight', 'weight-validation-message', 'Please enter your weight');
+                hasErrors = true;
+            } else if (weight < 30 || weight > 500) {
+                let message = '';
+                if (weight < 30) {
+                    message = 'Weight must be at least 30 kg';
+                } else if (weight > 500) {
+                    message = 'Weight must be 500 kg or less';
+                }
+                showValidationMessage('user_weight', 'weight-validation-message', message);
+                hasErrors = true;
+            }
+            
+            // Validate duration with form-style validation
+            if (!durationInput.value) {
+                showValidationMessage('duration_minutes', 'duration-validation-message', 'Please enter duration');
+                hasErrors = true;
+            } else if (duration < 1 || duration > 600) {
+                let message = '';
+                if (duration < 1) {
+                    message = 'Duration must be at least 1 minute';
+                } else if (duration > 600) {
+                    message = 'Duration must be 600 minutes or less';
+                }
+                showValidationMessage('duration_minutes', 'duration-validation-message', message);
+                hasErrors = true;
+            }
+            
+            // If there are validation errors, focus on first invalid field
+            if (hasErrors) {
+                if (!weightInput.value || weight < 30 || weight > 500) {
+                    weightInput.focus();
+                } else if (!durationInput.value || duration < 1 || duration > 600) {
+                    durationInput.focus();
+                }
+                return;
+            }
+            
+            const exercise = exerciseLookup[selectedExerciseId];
+            const metValue = parseFloat(exercise.met_value);
+            const calculatedCalories = calculateCalories(metValue, duration, weight);
+            
+            // Update calories input with animation
+            caloriesInput.style.background = '#d4edda';
+            caloriesInput.value = calculatedCalories;
+            
+            // Show calculation details
+            calcFormula.innerHTML = `${duration} min × (${metValue} × 3.5 × ${weight} kg) ÷ 200 = ${calculatedCalories} calories`;
+            calcDetails.classList.add('show');
+            
+            // Reset background after animation
+            setTimeout(() => {
+                caloriesInput.style.background = '';
+            }, 1000);
         }
         
         // Handle category selection
@@ -872,8 +1027,14 @@ $category_icons = [
         
         // Event listeners
         document.getElementById('exercise_type').addEventListener('change', updateCaloriesCalculation);
-        document.getElementById('duration_minutes').addEventListener('input', updateCaloriesCalculation);
-        document.getElementById('user_weight').addEventListener('input', updateCaloriesCalculation);
+        document.getElementById('duration_minutes').addEventListener('input', function() {
+            validateDurationInput();
+            updateCaloriesCalculation();
+        });
+        document.getElementById('user_weight').addEventListener('input', function() {
+            validateWeightInput();
+            updateCaloriesCalculation();
+        });
         document.getElementById('auto-calculate-btn').addEventListener('click', autoCalculateCalories);
         
         // Date/time validation
