@@ -13,8 +13,8 @@ This project is developed by **4 team members**, each responsible for one module
 | 🏃‍♂️ **Exercise Tracker** | Jooyee | ✅ Complete |
 | 📖 **Diary Journal** | JunHui | ✅ Complete |
 | 💰 **Money Tracker** | Wilson | ✅ Complete |
-| ✅ **Habit Tracker** | Ng Xue En | ✔️ Need Testing|
-| 🛠️ **Admin** | Wilson | ✔️ Need Testing |
+| ✅ **Habit Tracker** | Ng Xue En | ✅ Complete |
+| 🛠️ **Admin** | Wilson | ✅ Complete |
 
 ## 🎯 Module: Exercise Tracker
 
