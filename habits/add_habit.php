@@ -6,57 +6,58 @@ $error = '';
 $default_date = date('Y-m-d');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $habit_name = trim($_POST['habit_name'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $frequency = $_POST['frequency'] ?? '';
-    $start_date = $_POST['start_date'] ?? '';
-    $end_date = $_POST['end_date'] ?? '';
-    $category = trim($_POST['category'] ?? 'Uncategorized');
-    $habit_type = $_POST['habit_type'] ?? 'normal';
-    $timer_duration = isset($_POST['timer_duration']) && $_POST['timer_duration'] !== '' ? (int) $_POST['timer_duration'] : null;
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
+  $habit_name = trim($_POST['habit_name'] ?? '');
+  $description = trim($_POST['description'] ?? '');
+  $frequency = $_POST['frequency'] ?? '';
+  $start_date = $_POST['start_date'] ?? '';
+  $end_date = $_POST['end_date'] ?? '';
+  $category = trim($_POST['category'] ?? 'Uncategorized');
+  $habit_type = $_POST['habit_type'] ?? 'normal';
+  $timer_duration = isset($_POST['timer_duration']) && $_POST['timer_duration'] !== '' ? (int) $_POST['timer_duration'] : null;
+  $is_active = isset($_POST['is_active']) ? 1 : 0;
 
-    // Validation
-    if ($habit_name === '' || $frequency === '' || $start_date === '' || $end_date === '') {
-        $error = "Habit name, frequency, start date, and end date are required.";
-    } elseif ($start_date < date('Y-m-d')) {
-        $error = "Start date cannot be earlier than today.";
-    } elseif ($end_date < $start_date) {
-        $error = "End date cannot be earlier than start date.";
-    } elseif (mb_strlen($habit_name) > 255) {
-        $error = "Habit name must be 255 characters or less.";
-    } elseif (!in_array($frequency, ['daily', 'weekly', 'custom'], true) || !in_array($habit_type, ['normal', 'timer'], true)) {
-        $error = "Invalid input.";
-    } else {
-        $c = db();
+  // Validation
+  if ($habit_name === '' || $frequency === '' || $start_date === '' || $end_date === '') {
+    $error = "Habit name, frequency, start date, and end date are required.";
+  } elseif ($start_date < date('Y-m-d')) {
+    $error = "Start date cannot be earlier than today.";
+  } elseif ($end_date < $start_date) {
+    $error = "End date cannot be earlier than start date.";
+  } elseif (mb_strlen($habit_name) > 255) {
+    $error = "Habit name must be 255 characters or less.";
+  } elseif (!in_array($frequency, ['daily', 'weekly', 'custom'], true) || !in_array($habit_type, ['normal', 'timer'], true)) {
+    $error = "Invalid input.";
+  } else {
+    $c = db();
 
-        $sql = "INSERT INTO habits 
+    $sql = "INSERT INTO habits 
           (user_id, habit_name, description, frequency, start_date, end_date, category, habit_type, timer_duration, is_active)
           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $c->prepare($sql);
-        $uid = current_user_id();
-        $stmt->bind_param(
-          "issssssiii",
-          $uid,
-          $habit_name,
-          $description,
-          $frequency,
-          $start_date,
-          $end_date,
-          $category,
-          $habit_type,
-          $timer_duration,
-          $is_active
-        );
+    $stmt = $c->prepare($sql);
+    $uid = current_user_id();
+    $stmt->bind_param(
+      "isssssssii",
+      $uid,             // i
+      $habit_name,      // s
+      $description,     // s
+      $frequency,       // s
+      $start_date,      // s
+      $end_date,        // s
+      $category,        // s
+      $habit_type,      // s  ✅ now string
+      $timer_duration,  // i
+      $is_active        // i
+    );
 
-        if ($stmt->execute()) {
-            header("Location: index.php?added=1");
-            exit();
-        } else {
-            $error = "Failed to add habit: " . $stmt->error;
-        }
-        $stmt->close();
+
+    if ($stmt->execute()) {
+      header("Location: index.php?added=1");
+      exit();
+    } else {
+      $error = "Failed to add habit: " . $stmt->error;
     }
+    $stmt->close();
+  }
 }
 
 include '../includes/header.php';
@@ -116,7 +117,8 @@ include '../includes/header.php';
       <select name="habit_type" id="habit_type" onchange="toggleTimerInput()" class="form-control"
         style="max-width:250px;">
         <option value="normal" <?= (($_POST['habit_type'] ?? '') === 'normal') ? 'selected' : ''; ?>>Normal</option>
-        <option value="timer" <?= (($_POST['habit_type'] ?? '') === 'timer') ? 'selected' : ''; ?>>Timer (track minutes)</option>
+        <option value="timer" <?= (($_POST['habit_type'] ?? '') === 'timer') ? 'selected' : ''; ?>>Timer (track minutes)
+        </option>
       </select>
     </div>
 
