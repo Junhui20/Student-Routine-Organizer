@@ -62,3 +62,84 @@ IP: ::1
 URL: /Student-Routine-Organizer/money/add_transaction.php
 IP: ::1
 
+[2025-08-29 03:47:28] EXCEPTION: Call to private ErrorHandler::__construct() from global scope in forgot_password.php:14
+Stack trace:
+URL: /student-routine-organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:09:35] EXCEPTION: Call to private ErrorHandler::__construct() from global scope in forgot_password.php:14
+Stack trace:
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:09:51] EXCEPTION: Call to private ErrorHandler::__construct() from global scope in forgot_password.php:14
+Stack trace:
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:13:29] EXCEPTION: Call to private method ErrorHandler::logError() from scope PasswordResetHandler in PasswordResetHandler.php:301
+Stack trace:
+#0 C:\xampp\htdocs\Student-Routine-Organizer\includes\PasswordResetHandler.php(58): PasswordResetHandler->sendResetEmail
+#1 C:\xampp\htdocs\Student-Routine-Organizer\auth\forgot_password.php(37): PasswordResetHandler->generateResetToken
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:14:12] EXCEPTION: Call to private method ErrorHandler::logError() from scope PasswordResetHandler in PasswordResetHandler.php:301
+Stack trace:
+#0 C:\xampp\htdocs\Student-Routine-Organizer\includes\PasswordResetHandler.php(58): PasswordResetHandler->sendResetEmail
+#1 C:\xampp\htdocs\Student-Routine-Organizer\auth\forgot_password.php(37): PasswordResetHandler->generateResetToken
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:17:44] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:17:58] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:25:46] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:26:08] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:26:21] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:26:55] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:31:01] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:31:05] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:36:22] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:56:13] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:56:30] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 04:59:21] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+
+[2025-08-29 05:07:21] Email Sending: SMTP Error: data not accepted. in PHPMailer.php:2158
+URL: /Student-Routine-Organizer/auth/forgot_password.php
+IP: ::1
+

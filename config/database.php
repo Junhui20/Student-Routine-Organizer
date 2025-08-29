@@ -11,11 +11,15 @@ class Database {
         
         try {
             $this->connection = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->database, 
-                $this->username, 
+                "mysql:host=" . $this->host . ";dbname=" . $this->database,
+                $this->username,
                 $this->password
             );
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Set MySQL timezone to match PHP timezone
+            $phpTimezone = date_default_timezone_get();
+            $this->connection->exec("SET time_zone = '" . date('P') . "'");
         } catch(PDOException $e) {
             echo "Connection error: " . $e->getMessage();
         }

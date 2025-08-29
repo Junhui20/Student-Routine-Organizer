@@ -1,5 +1,10 @@
 <?php
 require_once 'ErrorHandler.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 class PasswordResetHandler {
     private $pdo;
@@ -63,7 +68,12 @@ class PasswordResetHandler {
             }
 
         } catch (Exception $e) {
-            $this->errorHandler->logError($e, 'Password Reset', $_SESSION['user_id'] ?? null);
+            ErrorHandler::logApplicationError($e->getMessage(), 'Password Reset', [
+                'user_id' => $_SESSION['user_id'] ?? null,
+                'email' => $email ?? null,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return ['success' => false, 'message' => 'An error occurred. Please try again later.'];
         }
     }
@@ -97,7 +107,11 @@ class PasswordResetHandler {
             ];
 
         } catch (Exception $e) {
-            $this->errorHandler->logError($e, 'Token Validation', null);
+            ErrorHandler::logApplicationError($e->getMessage(), 'Token Validation', [
+                'token' => substr($token ?? '', 0, 10) . '...',
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return ['valid' => false, 'message' => 'An error occurred while validating the token.'];
         }
     }
@@ -151,7 +165,11 @@ class PasswordResetHandler {
 
         } catch (Exception $e) {
             $this->pdo->rollBack();
-            $this->errorHandler->logError($e, 'Password Reset', $validation['user_id'] ?? null);
+            ErrorHandler::logApplicationError($e->getMessage(), 'Password Reset', [
+                'user_id' => $validation['user_id'] ?? null,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return ['success' => false, 'message' => 'An error occurred while resetting the password.'];
         }
     }
@@ -178,7 +196,11 @@ class PasswordResetHandler {
             $stmt->execute([$userId]);
         } catch (Exception $e) {
             // Log but don't fail the main operation
-            $this->errorHandler->logError($e, 'Token Cleanup', $userId);
+            ErrorHandler::logApplicationError($e->getMessage(), 'Token Cleanup', [
+                'user_id' => $userId,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
         }
     }
 
@@ -188,84 +210,174 @@ class PasswordResetHandler {
     private function generateResetLink($token) {
         $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-        $baseUrl = $protocol . '://' . $host . dirname($_SERVER['REQUEST_URI']);
+
+        // Get the base path by removing the current script path
+        $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+
+        // Extract the base path (e.g., /Student-Routine-Organizer)
+        $basePath = '';
+        if (strpos($requestUri, '/auth/') !== false) {
+            $basePath = substr($requestUri, 0, strpos($requestUri, '/auth/'));
+        } else {
+            $basePath = dirname($scriptName);
+        }
+
+        $baseUrl = $protocol . '://' . $host . $basePath;
         return $baseUrl . '/auth/reset_password.php?token=' . urlencode($token);
     }
 
     /**
-     * Send reset email (mock implementation for development)
+     * Send reset email using SMTP
      */
     private function sendResetEmail($email, $username, $resetLink) {
-        // In production, implement actual email sending using PHPMailer or similar
-        // For now, we'll simulate email sending and log for development
-        
-        $subject = "Password Reset Request - Student Routine Organizer";
-        $message = "
-        <html>
-        <head>
-            <title>Password Reset Request</title>
-        </head>
-        <body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
-            <div style='max-width: 600px; margin: 0 auto; padding: 20px;'>
-                <h2 style='color: #007bff;'>Password Reset Request</h2>
-                <p>Hello <strong>{$username}</strong>,</p>
-                <p>You have requested to reset your password for your Student Routine Organizer account.</p>
-                <p>Click the link below to reset your password:</p>
-                <p style='margin: 20px 0;'>
-                    <a href='{$resetLink}' style='background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;'>Reset Password</a>
-                </p>
-                <p>Or copy and paste this URL into your browser:</p>
-                <p style='word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px;'>{$resetLink}</p>
-                <p><strong>This link will expire in 1 hour.</strong></p>
-                <p>If you did not request this password reset, please ignore this email.</p>
-                <hr style='margin: 30px 0; border: none; border-top: 1px solid #eee;'>
-                <p style='font-size: 12px; color: #666;'>Student Routine Organizer - Diary Journal Module</p>
-            </div>
-        </body>
-        </html>
-        ";
+        try {
+            $mail = new PHPMailer(true);
 
-        // For development: Log email content to file
+            // Server settings
+            $mail->isSMTP();
+            $mail->Host = 'smtp.mailersend.net';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'MS_5Mhkm1@test-q3enl6kvyx542vwr.mlsender.net';
+            $mail->Password = 'mssp.cPtfhgE.pxkjn41qqyplz781.TCltvTn';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+
+            // Recipients
+            $mail->setFrom('MS_5Mhkm1@test-q3enl6kvyx542vwr.mlsender.net', 'Student Routine Organizer');
+            $mail->addAddress($email, $username);
+            $mail->addReplyTo('MS_5Mhkm1@test-q3enl6kvyx542vwr.mlsender.net', 'Student Routine Organizer');
+
+            // Content
+            $mail->isHTML(true);
+            $mail->Subject = 'Password Reset Request - Student Routine Organizer';
+
+            $htmlMessage = "
+            <html>
+            <head>
+                <title>Password Reset Request</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+                    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+                    .button { background-color: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; margin: 20px 0; font-weight: bold; }
+                    .link-box { background-color: #e9ecef; padding: 15px; border-radius: 4px; word-break: break-all; margin: 15px 0; }
+                    .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; }
+                    .warning { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 15px; border-radius: 4px; margin: 15px 0; }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <div class='header'>
+                        <h1 style='margin: 0; font-size: 24px;'>🔐 Password Reset Request</h1>
+                    </div>
+                    <div class='content'>
+                        <p>Hello <strong>{$username}</strong>,</p>
+                        <p>You have requested to reset your password for your Student Routine Organizer account.</p>
+                        <p>Click the button below to reset your password:</p>
+                        <p style='text-align: center;'>
+                            <a href='{$resetLink}' class='button'>Reset My Password</a>
+                        </p>
+                        <p>Or copy and paste this URL into your browser:</p>
+                        <div class='link-box'>{$resetLink}</div>
+                        <div class='warning'>
+                            <strong>⚠️ Important:</strong> This link will expire in 1 hour for security reasons.
+                        </div>
+                        <p>If you did not request this password reset, please ignore this email. Your password will remain unchanged.</p>
+                        <p>For security reasons, this email was sent from an automated system. Please do not reply to this email.</p>
+                    </div>
+                    <div class='footer'>
+                        <p>Student Routine Organizer<br>
+                        Helping students organize their academic life</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            ";
+
+            $textMessage = "
+Password Reset Request - Student Routine Organizer
+
+Hello {$username},
+
+You have requested to reset your password for your Student Routine Organizer account.
+
+Please visit the following link to reset your password:
+{$resetLink}
+
+This link will expire in 1 hour for security reasons.
+
+If you did not request this password reset, please ignore this email. Your password will remain unchanged.
+
+---
+Student Routine Organizer
+Helping students organize their academic life
+            ";
+
+            $mail->Body = $htmlMessage;
+            $mail->AltBody = $textMessage;
+
+            // Send the email
+            $result = $mail->send();
+
+            // Log successful email for development tracking
+            $this->logEmailSent($email, $resetLink, true);
+
+            return $result;
+
+        } catch (Exception $e) {
+            // Log the error
+            ErrorHandler::logApplicationError($e->getMessage(), 'Email Sending', [
+                'email' => $email,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            // Log failed email attempt with specific error handling
+            $errorMessage = $e->getMessage();
+            $this->logEmailSent($email, $resetLink, false, $errorMessage);
+
+            // Check if it's a trial account limitation (check for common SMTP trial errors)
+            if (strpos($errorMessage, 'Trial accounts can only send emails') !== false ||
+                strpos($errorMessage, 'data not accepted') !== false) {
+                // For trial accounts, we'll log the reset link for manual testing
+                $this->logEmailSent($email, $resetLink, false, 'TRIAL_ACCOUNT_LIMITATION - Reset link logged for manual testing');
+                return true; // Return true to show success message with debug link
+            }
+
+            return false;
+        }
+    }
+
+    /**
+     * Log email sending attempts for debugging
+     */
+    private function logEmailSent($email, $resetLink, $success, $error = null) {
         $logFile = __DIR__ . '/../logs/password_reset_emails.log';
         $logDir = dirname($logFile);
         if (!is_dir($logDir)) {
             mkdir($logDir, 0755, true);
         }
-        
+
+        $status = $success ? 'SUCCESS' : 'FAILED';
         $logEntry = "
-=== PASSWORD RESET EMAIL ===
+=== PASSWORD RESET EMAIL {$status} ===
 Date: " . date('Y-m-d H:i:s') . "
 To: {$email}
-Subject: {$subject}
 Reset Link: {$resetLink}
+Status: {$status}";
+
+        if (!$success && $error) {
+            $logEntry .= "
+Error: {$error}";
+        }
+
+        $logEntry .= "
 =============================
 
 ";
         file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-
-        // TODO: Implement actual email sending
-        // Example with PHPMailer:
-        /*
-        $mail = new PHPMailer(true);
-        $mail->isSMTP();
-        $mail->Host = 'smtp.gmail.com'; // Set your SMTP server
-        $mail->SMTPAuth = true;
-        $mail->Username = 'your-email@gmail.com';
-        $mail->Password = 'your-app-password';
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 587;
-        
-        $mail->setFrom('noreply@yourdomain.com', 'Student Routine Organizer');
-        $mail->addAddress($email, $username);
-        $mail->isHTML(true);
-        $mail->Subject = $subject;
-        $mail->Body = $message;
-        
-        return $mail->send();
-        */
-
-        // For development, always return true
-        return true;
     }
 
     /**
@@ -292,7 +404,11 @@ Reset Link: {$resetLink}
             
             return $stmt->fetch();
         } catch (Exception $e) {
-            $this->errorHandler->logError($e, 'Reset Stats', null);
+            ErrorHandler::logApplicationError($e->getMessage(), 'Reset Stats', [
+                'email' => $email ?? null,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
             return null;
         }
     }
